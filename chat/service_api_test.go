@@ -26,7 +26,7 @@ var (
 )
 
 func TestServiceRead(t *testing.T) {
-	t.Run("successful", func(t *testing.T) {
+	t.Run("successful req", func(t *testing.T) {
 		setup()
 		mockClient.GetFunc = func(ctx context.Context, path string) ([]byte, error) {
 			if exp := "/Services/SID"; exp != path {
@@ -77,7 +77,7 @@ func TestServiceRead(t *testing.T) {
 }
 
 func TestServiceCreate(t *testing.T) {
-	t.Run("successful", func(t *testing.T) {
+	t.Run("successful req", func(t *testing.T) {
 		setup()
 		mockClient.PostFunc = func(ctx context.Context, path string, body io.Reader) ([]byte, error) {
 			var (

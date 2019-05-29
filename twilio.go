@@ -11,12 +11,12 @@ type Context struct {
 }
 
 // NewContext store the various credentials into a `twilio.Context` instance and
-// sets `http.DefaultClient` as HTTPClient
+// sets `http.DefaultClient` as HTTPClient.
 func NewContext(accountSID, authToken, region string) Context {
 	return NewContextWithHTTP(accountSID, authToken, region, http.DefaultClient)
 }
 
-// NewContextWithHTTP sames as `NewContext` but requires a `twilio.RequestHandler`
+// NewContextWithHTTP sames as `NewContext` but requires a `twilio.RequestHandler`.
 func NewContextWithHTTP(accountSID, authToken, region string, httpClient RequestHandler) Context {
 	return Context{
 		AccountSID: accountSID,

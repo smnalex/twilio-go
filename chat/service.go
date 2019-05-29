@@ -5,7 +5,7 @@ type ServiceResource struct {
 	ServiceRepository
 }
 
-// Service holds a service configuration
+// Service holds a service configuration.
 type Service struct {
 	SID                          string                 `json:"sid,omitempty"`
 	FriendlyName                 string                 `json:"friendly_name,omitempty"`
@@ -32,7 +32,14 @@ type Service struct {
 	Media                        map[string]interface{} `json:"media,omitempty"`
 }
 
-// Notifications holds a service notification configuration
+// NotificationChannelProperty holds the propeties of push notifications.
+type NotificationChannelProperty struct {
+	Template string `json:"template,omitempty"`
+	Enabled  bool   `json:"enabled,omitempty"`
+	Sound    bool   `json:"sound,omitempty"`
+}
+
+// Notifications holds a service notification configuration.
 type Notifications struct {
 	LogEnabled       bool                         `json:"log_enabled,omitempty"`
 	AddedToChannel   *NotificationChannelProperty `json:"added_to_channel,omitempty"`
@@ -44,14 +51,7 @@ type Notifications struct {
 	RemoveFromChannel *NotificationChannelProperty `json:"remove_from_channel,omitempty"`
 }
 
-// NotificationChannelProperty holds the propeties of push notifications
-type NotificationChannelProperty struct {
-	Template string `json:"template,omitempty"`
-	Enabled  bool   `json:"enabled,omitempty"`
-	Sound    bool   `json:"sound,omitempty"`
-}
-
-// ServiceUpdateParams holds the service update properties
+// ServiceUpdateParams holds the service update properties.
 type ServiceUpdateParams struct {
 	FriendlyName                 string                 `json:"friendly_name,omitempty"`
 	DefaultServiceRoleSID        string                 `json:"default_service_role_sid,omitempty"`

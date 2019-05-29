@@ -11,18 +11,18 @@ import (
 )
 
 var (
-	// ErrNotFound resource not found
+	// ErrNotFound resource not found.
 	ErrNotFound = errors.New("not found")
 )
 
-// HTTPClient http wrapper which allows interacting with various twilio apis.
+// HTTPClient wrapper which allows interacting with various twilio apis.
 type HTTPClient interface {
 	Get(context.Context, string) ([]byte, error)
 	Post(context.Context, string, io.Reader) ([]byte, error)
 	Delete(context.Context, string) ([]byte, error)
 }
 
-// RequestHandler abstracts `http.Client`
+// RequestHandler abstracts `http.Client`.
 type RequestHandler interface {
 	Do(*http.Request) (*http.Response, error)
 }
@@ -34,8 +34,8 @@ type apiClient struct {
 	RequestHandler
 }
 
-// NewHTTPClient returns a new twilio.Client which can be used to access various API
-// twilio rest apis. It requires a custom type `twilio.RequestHandler` which has the
+// NewHTTPClient returns a new twilio.Client which can be used to access various
+// twilio apis. It requires a custom type `twilio.RequestHandler` which has the
 // method signature of the `http.Client` struct `Do` method.
 func NewHTTPClient(accountSID, authToken, baseURL string, rh RequestHandler) (HTTPClient, error) {
 	url, err := url.Parse(baseURL)

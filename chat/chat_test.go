@@ -8,7 +8,7 @@ import (
 )
 
 func TestNew(t *testing.T) {
-	t.Run("invalid env url", func(t *testing.T) {
+	t.Run("unsuccessful invalid env url", func(t *testing.T) {
 		os.Setenv("TWILIO_CHAT_HOST", "%2")
 		if _, err := New(twilio.Context{}); err == nil {
 			t.Errorf("exp parsing err, got none")
