@@ -12,9 +12,8 @@ import (
 type (
 	// ServiceRepository defines the interface for interacting with chat service api.
 	ServiceRepository interface {
-		// List(context.Context) ([]Service, error)
 		Read(context.Context, string) (Service, error)
-		Create(context.Context, ServiceUpdateParams) (Service, error)
+		Create(context.Context, string) (Service, error)
 		Update(context.Context, string, ServiceUpdateParams) (Service, error)
 		Delete(context.Context, string) error
 	}
@@ -24,17 +23,8 @@ type (
 	}
 )
 
-// TODO: alex
-//func (api serviceAPI) List(ctx context.Context) ([]Service, error) {
-//	var services []Service
-//	data, err := api.client.Get(ctx, "/Services")
-//	if err != nil {
-//		return services, err
-//	}
-//	err = json.Unmarshal(data, &services)
-//	return services, err
-//}
-
+// GET /Services/{Service SID}
+// https://www.twilio.com/docs/chat/rest/services#retrieve-a-service
 func (api serviceAPI) Read(ctx context.Context, SID string) (Service, error) {
 	var service Service
 	data, err := api.client.Get(ctx, fmt.Sprintf("/Services/%s", SID))
@@ -45,14 +35,20 @@ func (api serviceAPI) Read(ctx context.Context, SID string) (Service, error) {
 	return service, err
 }
 
-func (api serviceAPI) Create(ctx context.Context, service ServiceUpdateParams) (Service, error) {
-	return api.post(ctx, "/Services", service)
+// POST /Services
+// https://www.twilio.com/docs/chat/rest/services#create-a-service
+func (api serviceAPI) Create(ctx context.Context, friendlyName string) (Service, error) {
+	return api.post(ctx, "/Services", ServiceUpdateParams{FriendlyName: friendlyName})
 }
 
+// POST /Services/{Service SID}
+// https://www.twilio.com/docs/chat/rest/services#update-a-service
 func (api serviceAPI) Update(ctx context.Context, SID string, service ServiceUpdateParams) (Service, error) {
 	return api.post(ctx, fmt.Sprintf("/Services/%s", SID), service)
 }
 
+// DELETE /Services/{Service SID}
+// https://www.twilio.com/docs/chat/rest/services#delete-a-service
 func (api serviceAPI) Delete(ctx context.Context, SID string) error {
 	_, err := api.client.Delete(ctx, fmt.Sprintf("/Services/%s", SID))
 	return err
@@ -60,7 +56,7 @@ func (api serviceAPI) Delete(ctx context.Context, SID string) error {
 
 func (api serviceAPI) post(ctx context.Context, path string, updateParams ServiceUpdateParams) (Service, error) {
 	var updatedService Service
-	body, _ := json.Marshal(updateParams) // err ignored as servceUpdateParams uses allowed types
+	body, _ := json.Marshal(updateParams) // err ignored as `ServiceUpdateParams` uses allowed types
 	data, err := api.client.Post(ctx, path, bytes.NewReader(body))
 	if err != nil {
 		return updatedService, err

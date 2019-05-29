@@ -22,20 +22,10 @@ type Chat struct {
 	Media        interface{}
 }
 
-func chatEndpointForRegion(region string) string {
-	url := os.Getenv("TWILIO_CHAT_HOST")
-	if url == "" && region != "" {
-		return fmt.Sprintf("https://chat.%s.twilio.com/v2", region)
-	} else if url == "" {
-		return "https://chat.twilio.com/v2"
-	}
-	return url
-}
-
 // New returns a chat instance with a base url set to `https://chat.twilio.com/v2`
 // if `TWILIO_CHAT_HOST` env not defined.
-func New(tctx twilio.TwilioContext) (*Chat, error) {
-	var chat Chat
+func New(tctx twilio.Context) (Chat, error) {
+	var chatClient Chat
 
 	client, err := twilio.NewHTTPClient(
 		tctx.AccountSID,
@@ -44,12 +34,21 @@ func New(tctx twilio.TwilioContext) (*Chat, error) {
 		tctx.HTTPClient,
 	)
 	if err != nil {
-		return nil, err
+		return chatClient, err
 	}
 
 	{
-		chat.Services = ServiceResource{serviceAPI{client}}
+		chatClient.Services = ServiceResource{serviceAPI{client}}
 	}
+	return chatClient, nil
+}
 
-	return &chat, nil
+func chatEndpointForRegion(region string) string {
+	url := os.Getenv("TWILIO_CHAT_HOST")
+	if url == "" && region != "" {
+		return fmt.Sprintf("https://chat.%s.twilio.com/v2", region)
+	} else if url == "" {
+		return "https://chat.twilio.com/v2"
+	}
+	return url
 }

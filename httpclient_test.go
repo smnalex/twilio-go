@@ -23,19 +23,19 @@ var (
 	acc     = "acc"
 	setup   = func() {
 		mockedRequestHandler = &mockRequestHandler{}
-		client, _ = NewClient(acc, auth, baseURL, mockedRequestHandler)
+		client, _ = NewHTTPClient(acc, auth, baseURL, mockedRequestHandler)
 	}
 )
 
-func TestNewClient(t *testing.T) {
+func TestNewHTTPClient(t *testing.T) {
 	t.Run("correct configuration", func(t *testing.T) {
-		if _, err := NewClient(acc, auth, baseURL, nil); err != nil {
+		if _, err := NewHTTPClient(acc, auth, baseURL, nil); err != nil {
 			t.Errorf("exp no err, got %v", err)
 		}
 	})
 
 	t.Run("invalid base URL", func(t *testing.T) {
-		if _, err := NewClient(acc, auth, "%", nil); err == nil {
+		if _, err := NewHTTPClient(acc, auth, "%", nil); err == nil {
 			t.Errorf("exp invalid URL parsing err, got %v", err)
 		}
 	})

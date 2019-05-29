@@ -1,11 +1,13 @@
 # Twilio Programmable Chat
 
-## Requirements
+Client for [Twilio Programmable Chat](https://www.twilio.com/docs/chat) API.
 
-- [Go](https://golang.org/doc/install) 1.13
+## Documentation
+[GoDoc](https://godoc.org/github.com/smnalex/twilio-go/chat)
 
 ## Usage
 
+### Services
 ```go
 import (
     "github.com/twilio-go/"
@@ -24,6 +26,13 @@ func main() {
     // Create a new service
     // Post https://chat.twilio.com/v2/Services
     service, err := chat.Services.Create(ctx, ServiceCreateParams{"chat-v1"})
+    if err != nil {
+        log.Fatal(err)
+    }
+
+    // TODO: List services
+    // Get https://chat.twilio.com/v2/Services
+    services, err := chat.Services.List(ctx)
     if err != nil {
         log.Fatal(err)
     }

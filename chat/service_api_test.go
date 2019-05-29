@@ -25,10 +25,6 @@ var (
 	}
 )
 
-func TestServiceList(t *testing.T) {
-
-}
-
 func TestServiceRead(t *testing.T) {
 	t.Run("successful", func(t *testing.T) {
 		setup()
@@ -36,13 +32,7 @@ func TestServiceRead(t *testing.T) {
 			if exp := "/Services/SID"; exp != path {
 				t.Errorf("exp path %s, got %s", exp, path)
 			}
-
 			return ioutil.ReadFile("fixtures/service.json")
-		}
-
-		got, err := srv.Read(ctx, "SID")
-		if err != nil {
-			t.Errorf("exp no err, got %v", err)
 		}
 
 		var (
@@ -50,10 +40,13 @@ func TestServiceRead(t *testing.T) {
 			f, _ = os.Open("fixtures/service.json")
 		)
 
+		got, err := srv.Read(ctx, "SID")
+		if err != nil {
+			t.Errorf("exp no err, got %v", err)
+		}
 		if err := json.NewDecoder(f).Decode(&exp); err != nil {
 			t.Fatalf("exp no decoding issues")
 		}
-
 		if !cmp.Equal(got, exp) {
 			t.Errorf("exp a service got diffrent service %v", cmp.Diff(got, exp))
 		}
@@ -87,26 +80,18 @@ func TestServiceCreate(t *testing.T) {
 	t.Run("successful", func(t *testing.T) {
 		setup()
 		mockClient.PostFunc = func(ctx context.Context, path string, body io.Reader) ([]byte, error) {
-			if exp := "/Services"; exp != path {
-				t.Errorf("exp path %s, got %s", exp, path)
-			}
-
 			var (
 				gotBody, _ = ioutil.ReadAll(body)
 				expBody    = []byte(`{"friendly_name":"hello there"}`)
 			)
 
-			if bytes.Compare(gotBody, expBody) != 0 {
+			if exp := "/Services"; exp != path {
+				t.Errorf("exp path %s, got %s", exp, path)
+			}
+			if !bytes.Equal(gotBody, expBody) {
 				t.Errorf("exp body %s, got %s", expBody, gotBody)
 			}
-
 			return ioutil.ReadFile("fixtures/service.json")
-		}
-
-		updateParams := ServiceUpdateParams{FriendlyName: "hello there"}
-		got, err := srv.Create(ctx, updateParams)
-		if err != nil {
-			t.Errorf("exp no err, got %v", err)
 		}
 
 		var (
@@ -114,10 +99,13 @@ func TestServiceCreate(t *testing.T) {
 			f, _ = os.Open("fixtures/service.json")
 		)
 
+		got, err := srv.Create(ctx, "hello there")
+		if err != nil {
+			t.Errorf("exp no err, got %v", err)
+		}
 		if err := json.NewDecoder(f).Decode(&exp); err != nil {
 			t.Fatalf("exp no decoding issues")
 		}
-
 		if !cmp.Equal(got, exp) {
 			t.Errorf("exp a service got diffrent service %v", cmp.Diff(got, exp))
 		}
@@ -129,23 +117,18 @@ func TestServiceCreate(t *testing.T) {
 			return ioutil.ReadFile("fixtures/invalid.json")
 		}
 
-		updateParams := ServiceUpdateParams{FriendlyName: "hello there"}
-		_, got := srv.Create(ctx, updateParams)
-		if got == nil {
+		if _, got := srv.Create(ctx, "hello there"); got == nil {
 			t.Errorf("exp parsing err, got %v", got)
 		}
 	})
 
 	t.Run("successful with request err", func(t *testing.T) {
 		setup()
-
 		mockClient.PostFunc = func(ctx context.Context, path string, body io.Reader) ([]byte, error) {
 			return nil, errors.New("test")
 		}
 
-		updateParams := ServiceUpdateParams{FriendlyName: "hello there"}
-		_, got := srv.Create(ctx, updateParams)
-		if got == nil {
+		if _, got := srv.Create(ctx, "twilio-create"); got == nil {
 			t.Errorf("exp err(any), got %v", got)
 		}
 	})
@@ -162,8 +145,7 @@ func TestServiceUpdate(t *testing.T) {
 		}
 
 		updateParams := ServiceUpdateParams{FriendlyName: "hello there"}
-		_, got := srv.Update(ctx, "SID", updateParams)
-		if got != nil {
+		if _, got := srv.Update(ctx, "SID", updateParams); got != nil {
 			t.Errorf("exp no err, got %v", got)
 		}
 	})
@@ -179,9 +161,11 @@ func TestServiceDelete(t *testing.T) {
 			return nil, nil
 		}
 
-		err := srv.Delete(ctx, "SID")
-		if err != nil {
+		if err := srv.Delete(ctx, "SID"); err != nil {
 			t.Errorf("exp no err, got %v", err)
+		}
+		if !mockClient.DeleteInvoked {
+			t.Errorf("exp service.Delete() to be invoked")
 		}
 	})
 
@@ -191,17 +175,20 @@ func TestServiceDelete(t *testing.T) {
 			return nil, errors.New("")
 		}
 
-		got := srv.Delete(ctx, "SID")
-		if got == nil {
+		if got := srv.Delete(ctx, "SID"); got == nil {
 			t.Errorf("exp err(any), got %v", got)
+		}
+		if !mockClient.DeleteInvoked {
+			t.Errorf("exp service.Delete() to be invoked")
 		}
 	})
 }
 
 type mockHTTPClient struct {
-	GetFunc    func(context.Context, string) ([]byte, error)
-	PostFunc   func(context.Context, string, io.Reader) ([]byte, error)
-	DeleteFunc func(context.Context, string) ([]byte, error)
+	DeleteInvoked bool
+	GetFunc       func(context.Context, string) ([]byte, error)
+	PostFunc      func(context.Context, string, io.Reader) ([]byte, error)
+	DeleteFunc    func(context.Context, string) ([]byte, error)
 }
 
 func (m *mockHTTPClient) Get(ctx context.Context, path string) ([]byte, error) {
@@ -213,5 +200,6 @@ func (m *mockHTTPClient) Post(ctx context.Context, path string, body io.Reader) 
 }
 
 func (m *mockHTTPClient) Delete(ctx context.Context, path string) ([]byte, error) {
+	m.DeleteInvoked = true
 	return m.DeleteFunc(ctx, path)
 }

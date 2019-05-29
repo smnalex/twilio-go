@@ -72,7 +72,7 @@ func (client *apiClient) request(ctx context.Context, method, path string, body 
 	{
 		req.SetBasicAuth(client.accountSID, client.authToken)
 		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-		req.WithContext(ctx)
+		req = req.WithContext(ctx)
 	}
 
 	resp, err := client.Do(req)
