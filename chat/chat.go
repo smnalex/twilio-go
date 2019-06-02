@@ -15,7 +15,7 @@ type Chat struct {
 	Members      interface{}
 	Invites      interface{}
 	Messages     interface{}
-	Roles        interface{}
+	Roles        RoleResource
 	Services     ServiceResource
 	Users        interface{}
 	UserChannels interface{}
@@ -23,7 +23,7 @@ type Chat struct {
 }
 
 // New returns a chat instance with a base url set to `https://chat.twilio.com/v2`
-// if `TWILIO_CHAT_HOST` env not defined.
+// if `TWILIO_CHAT_HOST` not set.
 func New(tctx twilio.Context) (Chat, error) {
 	var chatClient Chat
 
@@ -38,6 +38,7 @@ func New(tctx twilio.Context) (Chat, error) {
 	}
 
 	{
+		chatClient.Roles = RoleResource{roleAPI{client}}
 		chatClient.Services = ServiceResource{serviceAPI{client}}
 	}
 	return chatClient, nil

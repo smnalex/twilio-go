@@ -2,6 +2,7 @@ package twilio
 
 import (
 	"context"
+	"encoding/json"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -10,12 +11,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-var (
-	// ErrNotFound resource not found.
-	ErrNotFound = errors.New("not found")
-)
-
-// HTTPClient wrapper which allows interacting with various twilio apis.
+// HTTPClient provides the API operation methods for making requests to Twilio.
 type HTTPClient interface {
 	Get(context.Context, string) ([]byte, error)
 	Post(context.Context, string, io.Reader) ([]byte, error)
@@ -82,13 +78,17 @@ func (client *apiClient) request(ctx context.Context, method, path string, body 
 	defer resp.Body.Close()
 
 	statusCode := resp.StatusCode
-	if statusCode < 200 || 400 <= statusCode {
-		if statusCode == http.StatusNotFound {
-			return nil, ErrNotFound
-		}
-
-		return nil, errors.Errorf("unexpected status code: %d", statusCode)
+	if statusCode >= http.StatusBadRequest {
+		return nil, decodeErr(resp.Body)
 	}
 
 	return ioutil.ReadAll(resp.Body)
+}
+
+func decodeErr(b io.Reader) error {
+	var err ErrTwilioResponse
+	if err := json.NewDecoder(b).Decode(&err); err != nil {
+		return err
+	}
+	return err
 }

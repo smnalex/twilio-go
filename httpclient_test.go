@@ -3,7 +3,6 @@ package twilio
 import (
 	"bytes"
 	"context"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strings"
@@ -100,31 +99,30 @@ func TestGet(t *testing.T) {
 		}
 	})
 
-	t.Run("unsuccessful request status 404", func(t *testing.T) {
+	t.Run("unsuccessful request status 4xx", func(t *testing.T) {
 		setup()
 		mockedRequestHandler.requestHandlerFunc = func(r *http.Request) (*http.Response, error) {
 			body := ioutil.NopCloser(strings.NewReader("{}"))
-			return &http.Response{StatusCode: 404, Body: body}, nil
+			return &http.Response{StatusCode: 400, Body: body}, nil
 		}
 
-		if _, err := client.Get(ctx, path); err != ErrNotFound {
-			t.Errorf("exp err not found, got %v", err)
+		exp := ErrTwilioResponse{}
+		if _, err := client.Get(ctx, path); err != exp {
+			t.Errorf("exp err %v, got %v", exp, err)
 		}
 		if !mockedRequestHandler.requestInvoked {
 			t.Error("exp HTTPClient.Get to be invoked")
 		}
 	})
 
-	t.Run("unsuccessful request status 5xx", func(t *testing.T) {
+	t.Run("unable to decode err body, invalid JSON", func(t *testing.T) {
 		setup()
 		mockedRequestHandler.requestHandlerFunc = func(r *http.Request) (*http.Response, error) {
-			body := ioutil.NopCloser(strings.NewReader("{}"))
+			body := ioutil.NopCloser(strings.NewReader("{invalid json}"))
 			return &http.Response{StatusCode: 500, Body: body}, nil
 		}
-
-		exp := fmt.Sprintf("unexpected status code: %d", 500)
-		if _, err := client.Get(ctx, path); exp != err.Error() {
-			t.Errorf("exp err not found, got %v", err)
+		if _, err := client.Get(ctx, path); err == nil {
+			t.Error("exp body parsing err, got none", err)
 		}
 		if !mockedRequestHandler.requestInvoked {
 			t.Error("exp HTTPClient.Get to be invoked")
@@ -136,15 +134,16 @@ func TestGet(t *testing.T) {
 		path = "/get%2"
 		mockedRequestHandler.requestHandlerFunc = func(r *http.Request) (*http.Response, error) {
 			body := ioutil.NopCloser(strings.NewReader("{}"))
-			return &http.Response{StatusCode: 500, Body: body}, nil
+			return &http.Response{StatusCode: 404, Body: body}, nil
 		}
 
 		if _, err := client.Get(ctx, path); err == nil {
-			t.Errorf("exp parsing err, got %v", err)
+			t.Error("exp parsing err, got none")
 		}
 		if mockedRequestHandler.requestInvoked {
-			t.Error("exp HTTPClient.Get to be invoked")
+			t.Error("exp HTTPClient.Get to not be invoked")
 		}
+		path = "/get"
 	})
 }
 
