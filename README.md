@@ -1,4 +1,4 @@
-# Twilio-Go 
+# Twilio-Go [![CircleCI Build Status](https://circleci.com/gh/smnalex/twilio-go.svg?style=shield)](https://circleci.com/gh/smnalex/twilio-go) 
 
 Clients for [Twilio](https://www.twilio.com/docs/) API.
 
@@ -21,8 +21,8 @@ import (
 
 func main() {
     // with http.DefaultClient
-    configuration := twilio.New(accountSID, authToken, region)
-    
+    configuration := twilio.NewContext()
+
     // with custom httpClient
     configuration := twilio.NewWithHTTP(accountSID, authToken, region, http.DefaultClient)
 

@@ -15,7 +15,7 @@ import (
 )
 func main() {
     // Configuration required for twilio services
-    configuration := twilio.NewContext(accSID, authToken, region)
+    configuration := twilio.NewContext()
 
     // Chat client
     chat, err := twchat.New(configuration)
