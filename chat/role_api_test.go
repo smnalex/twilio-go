@@ -145,8 +145,8 @@ func TestRoleCreate(t *testing.T) {
 			return []byte("invalid"), nil
 		}
 
-		if _, got := roles.Create(ctx, "SID", RoleCreateParams{}); got == nil {
-			t.Errorf("exp parsing err, got %v", got)
+		if _, err := roles.Create(ctx, "SID", RoleCreateParams{}); err == nil {
+			t.Errorf("exp parsing err, got %v", err)
 		}
 	})
 

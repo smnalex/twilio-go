@@ -68,8 +68,8 @@ func TestServiceRead(t *testing.T) {
 		}
 
 		exp := twilio.ErrTwilioResponse{}
-		if _, got := services.Read(ctx, "SID"); got != exp {
-			t.Errorf("exp err %v, got %v", exp, got)
+		if _, err := services.Read(ctx, "SID"); exp != err {
+			t.Errorf("exp err %v, got %v", exp, err)
 		}
 	})
 
@@ -145,8 +145,8 @@ func TestServiceCreate(t *testing.T) {
 			return []byte("invalid"), nil
 		}
 
-		if _, got := services.Create(ctx, ServiceCreateParams{}); got == nil {
-			t.Errorf("exp parsing err, got %v", got)
+		if _, err := services.Create(ctx, ServiceCreateParams{}); err == nil {
+			t.Errorf("exp parsing err, got %v", err)
 		}
 	})
 
@@ -207,9 +207,9 @@ func TestServiceUpdate(t *testing.T) {
 		)
 		json.NewDecoder(f).Decode(&exp)
 
-		service, got := services.Update(ctx, "SID", ServiceUpdateParams{})
-		if got != nil {
-			t.Errorf("exp no err, got %v", got)
+		service, err := services.Update(ctx, "SID", ServiceUpdateParams{})
+		if err != nil {
+			t.Errorf("exp no err, got %v", err)
 		}
 		if !cmp.Equal(exp, service) {
 			t.Errorf("response diff %v", cmp.Diff(exp, service))
