@@ -8,28 +8,15 @@ import (
 	"io/ioutil"
 	"os"
 	"testing"
-	"time"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/smnalex/twilio-go"
 )
 
 func TestServiceRead(t *testing.T) {
-	var (
-		mockClient *mockHTTPClient
-		services   serviceAPI
-
-		ctx   = context.Background()
-		setup = func() {
-			mockClient = &mockHTTPClient{}
-			services = serviceAPI{mockClient}
-		}
-	)
-
 	t.Run("success", func(t *testing.T) {
-		setup()
-		mockClient.GetFunc = func(ctx context.Context, path string) ([]byte, error) {
-			if exp := "/Services/SID"; exp != path {
+		client := &HTTPClientMock{}
+		client.GetFunc = func(ctx context.Context, path string) ([]byte, error) {
+			if exp := "/Services/sid"; exp != path {
 				t.Errorf("exp path %s, got %s", exp, path)
 			}
 			return ioutil.ReadFile("fixtures/service.json")
@@ -41,7 +28,7 @@ func TestServiceRead(t *testing.T) {
 		)
 		json.NewDecoder(f).Decode(&exp)
 
-		service, err := services.Read(ctx, "SID")
+		service, err := (serviceAPI{client}).Read(context.TODO(), "sid")
 		if err != nil {
 			t.Errorf("exp no err, got %v", err)
 		}
@@ -50,66 +37,18 @@ func TestServiceRead(t *testing.T) {
 		}
 	})
 
-	t.Run("response parsing body error", func(t *testing.T) {
-		setup()
-		mockClient.GetFunc = func(ctx context.Context, path string) ([]byte, error) {
-			return []byte("invalid"), nil
+	t.Run("errors", func(t *testing.T) {
+		fn := func(ctx context.Context, client *HTTPClientMock) (interface{}, error) {
+			return (serviceAPI{client}).Read(ctx, "sid")
 		}
-
-		if _, err := services.Read(ctx, "SID"); err == nil {
-			t.Errorf("exp parsing err, got %v", err)
-		}
-	})
-
-	t.Run("api response error", func(t *testing.T) {
-		setup()
-		mockClient.GetFunc = func(ctx context.Context, path string) ([]byte, error) {
-			return nil, twilio.ErrTwilioResponse{}
-		}
-
-		exp := twilio.ErrTwilioResponse{}
-		if _, err := services.Read(ctx, "SID"); exp != err {
-			t.Errorf("exp err %v, got %v", exp, err)
-		}
-	})
-
-	t.Run("api request ctx timeout", func(t *testing.T) {
-		setup()
-		mockClient.GetFunc = func(ctx context.Context, path string) ([]byte, error) {
-			select {
-			case <-time.After(time.Second * 1):
-				break
-			case <-ctx.Done():
-				return nil, ctx.Err()
-			}
-			return nil, nil
-		}
-
-		ctx, cancelFn := context.WithTimeout(ctx, 1*time.Microsecond)
-		defer cancelFn()
-
-		exp := context.DeadlineExceeded
-		if _, err := services.Read(ctx, "SID"); err != exp {
-			t.Errorf("exp err %v, got %v", exp, err)
-		}
+		APIMock(fn).TestGets((t))
 	})
 }
 
 func TestServiceCreate(t *testing.T) {
-	var (
-		mockClient *mockHTTPClient
-		services   serviceAPI
-
-		ctx   = context.Background()
-		setup = func() {
-			mockClient = &mockHTTPClient{}
-			services = serviceAPI{mockClient}
-		}
-	)
-
 	t.Run("success", func(t *testing.T) {
-		setup()
-		mockClient.PostFunc = func(ctx context.Context, path string, body io.Reader) ([]byte, error) {
+		client := &HTTPClientMock{}
+		client.PostFunc = func(ctx context.Context, path string, body io.Reader) ([]byte, error) {
 			var (
 				gotBody, _ = ioutil.ReadAll(body)
 				expBody    = []byte("FriendlyName=")
@@ -130,7 +69,7 @@ func TestServiceCreate(t *testing.T) {
 		)
 		json.NewDecoder(f).Decode(&exp)
 
-		service, err := services.Create(ctx, ServiceCreateParams{})
+		service, err := (serviceAPI{client}).Create(context.TODO(), ServiceCreateParams{})
 		if err != nil {
 			t.Errorf("exp no err, got %v", err)
 		}
@@ -139,60 +78,24 @@ func TestServiceCreate(t *testing.T) {
 		}
 	})
 
-	t.Run("response parsing body error", func(t *testing.T) {
-		setup()
-		mockClient.PostFunc = func(ctx context.Context, path string, body io.Reader) ([]byte, error) {
-			return []byte("invalid"), nil
+	t.Run("errors", func(t *testing.T) {
+		fn := func(ctx context.Context, client *HTTPClientMock) (interface{}, error) {
+			return (serviceAPI{client}).Create(ctx, ServiceCreateParams{})
 		}
-
-		if _, err := services.Create(ctx, ServiceCreateParams{}); err == nil {
-			t.Errorf("exp parsing err, got %v", err)
-		}
-	})
-
-	t.Run("api request ctx timeout", func(t *testing.T) {
-		setup()
-		mockClient.PostFunc = func(ctx context.Context, path string, body io.Reader) ([]byte, error) {
-			select {
-			case <-time.After(time.Second * 1):
-				break
-			case <-ctx.Done():
-				return nil, ctx.Err()
-			}
-			return nil, nil
-		}
-
-		ctx, cancelFn := context.WithTimeout(ctx, 1*time.Microsecond)
-		defer cancelFn()
-
-		exp := context.DeadlineExceeded
-		if _, err := services.Create(ctx, ServiceCreateParams{}); err != exp {
-			t.Errorf("exp err %v, got %v", exp, err)
-		}
+		APIMock(fn).TestPosts((t))
 	})
 }
 
 func TestServiceUpdate(t *testing.T) {
-	var (
-		mockClient *mockHTTPClient
-		services   serviceAPI
-
-		ctx   = context.Background()
-		setup = func() {
-			mockClient = &mockHTTPClient{}
-			services = serviceAPI{mockClient}
-		}
-	)
-
 	t.Run("success", func(t *testing.T) {
-		setup()
-		mockClient.PostFunc = func(ctx context.Context, path string, body io.Reader) ([]byte, error) {
+		client := &HTTPClientMock{}
+		client.PostFunc = func(ctx context.Context, path string, body io.Reader) ([]byte, error) {
 			var (
 				gotBody, _ = ioutil.ReadAll(body)
 				expBody    = []byte("")
 			)
 
-			if exp := "/Services/SID"; exp != path {
+			if exp := "/Services/sid"; exp != path {
 				t.Errorf("exp path %s, got %s", exp, path)
 			}
 			if !bytes.Equal(expBody, gotBody) {
@@ -207,7 +110,7 @@ func TestServiceUpdate(t *testing.T) {
 		)
 		json.NewDecoder(f).Decode(&exp)
 
-		service, err := services.Update(ctx, "SID", ServiceUpdateParams{})
+		service, err := (serviceAPI{client}).Update(context.TODO(), "sid", ServiceUpdateParams{})
 		if err != nil {
 			t.Errorf("exp no err, got %v", err)
 		}
@@ -216,71 +119,34 @@ func TestServiceUpdate(t *testing.T) {
 		}
 	})
 
-	t.Run("api request ctx timeout", func(t *testing.T) {
-		setup()
-		mockClient.PostFunc = func(ctx context.Context, path string, body io.Reader) ([]byte, error) {
-			select {
-			case <-time.After(time.Second * 1):
-				break
-			case <-ctx.Done():
-				return nil, ctx.Err()
-			}
-			return nil, nil
+	t.Run("errors", func(t *testing.T) {
+		fn := func(ctx context.Context, client *HTTPClientMock) (interface{}, error) {
+			return (serviceAPI{client}).Update(ctx, "sid", ServiceUpdateParams{})
 		}
-
-		ctx, cancelFn := context.WithTimeout(ctx, 1*time.Microsecond)
-		defer cancelFn()
-
-		exp := context.DeadlineExceeded
-		if _, err := services.Update(ctx, "SID", ServiceUpdateParams{}); err != exp {
-			t.Errorf("exp err %v, got %v", exp, err)
-		}
+		APIMock(fn).TestPosts((t))
 	})
 }
 
 func TestServiceDelete(t *testing.T) {
-	var (
-		mockClient *mockHTTPClient
-		services   serviceAPI
-
-		ctx   = context.Background()
-		setup = func() {
-			mockClient = &mockHTTPClient{}
-			services = serviceAPI{mockClient}
-		}
-	)
-
 	t.Run("success", func(t *testing.T) {
-		setup()
-		mockClient.DeleteFunc = func(ctx context.Context, path string) ([]byte, error) {
-			if exp := "/Services/SID"; exp != path {
+		client := &HTTPClientMock{}
+		client.DeleteFunc = func(ctx context.Context, path string) ([]byte, error) {
+			if exp := "/Services/sid"; exp != path {
 				t.Errorf("exp path %s, got %s", exp, path)
 			}
 			return nil, nil
 		}
 
-		if err := services.Delete(ctx, "SID"); err != nil {
+		if err := (serviceAPI{client}).Delete(context.TODO(), "sid"); err != nil {
 			t.Errorf("exp no err, got %v", err)
 		}
 	})
 
-	t.Run("api request ctx timeout", func(t *testing.T) {
-		setup()
-		mockClient.DeleteFunc = func(ctx context.Context, path string) ([]byte, error) {
-			select {
-			case <-time.After(1 * time.Second):
-				break
-			case <-ctx.Done():
-				return nil, ctx.Err()
-			}
-			return nil, nil
+	t.Run("errors", func(t *testing.T) {
+		fn := func(ctx context.Context, client *HTTPClientMock) (interface{}, error) {
+			err := (serviceAPI{client}).Delete(ctx, "sid")
+			return nil, err
 		}
-		ctx, cancel := context.WithTimeout(ctx, 5*time.Microsecond)
-		defer cancel()
-
-		exp := context.DeadlineExceeded
-		if err := services.Delete(ctx, "SID"); err != exp {
-			t.Errorf("exp err %v err, got %v", exp, err)
-		}
+		APIMock(fn).TestDeletes((t))
 	})
 }

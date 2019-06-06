@@ -24,16 +24,16 @@ type RequestHandler interface {
 }
 
 type apiClient struct {
-	url        *url.URL
-	accountSID string
-	authToken  string
+	url       *url.URL
+	apiKey    string
+	apiSecret string
 	RequestHandler
 }
 
 // NewHTTPClient returns a new twilio.Client which can be used to access various
 // twilio apis. It requires a custom type `twilio.RequestHandler` which has the
 // method signature of the `http.Client` struct `Do` method.
-func NewHTTPClient(accountSID, authToken, baseURL string, rh RequestHandler) (HTTPClient, error) {
+func NewHTTPClient(apiKey, apiSecret, baseURL string, rh RequestHandler) (HTTPClient, error) {
 	url, err := url.Parse(baseURL)
 	if err != nil {
 		return nil, errors.Wrap(err, "could not parse url")
@@ -41,8 +41,8 @@ func NewHTTPClient(accountSID, authToken, baseURL string, rh RequestHandler) (HT
 
 	return &apiClient{
 		url:            url,
-		accountSID:     accountSID,
-		authToken:      authToken,
+		apiKey:         apiKey,
+		apiSecret:      apiSecret,
 		RequestHandler: rh,
 	}, nil
 }
@@ -62,18 +62,18 @@ func (client *apiClient) Delete(ctx context.Context, path string) ([]byte, error
 func (client *apiClient) request(ctx context.Context, method, path string, body io.Reader) ([]byte, error) {
 	req, err := http.NewRequest(method, client.url.String()+path, body)
 	if err != nil {
-		return nil, errors.Wrap(err, "could not create request")
+		return nil, errors.Wrap(err, "httpclient: could not create request")
 	}
 
 	{
-		req.SetBasicAuth(client.accountSID, client.authToken)
+		req.SetBasicAuth(client.apiKey, client.apiSecret)
 		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 		req = req.WithContext(ctx)
 	}
 
 	resp, err := client.Do(req)
 	if err != nil {
-		return nil, errors.Wrapf(err, "could not get a response for %s", req.URL)
+		return nil, errors.Wrapf(err, "httpclient: could not get a response for %s", req.URL)
 	}
 	defer resp.Body.Close()
 

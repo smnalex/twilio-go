@@ -8,28 +8,15 @@ import (
 	"io/ioutil"
 	"os"
 	"testing"
-	"time"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/smnalex/twilio-go"
 )
 
 func TestRoleRead(t *testing.T) {
-	var (
-		mockClient *mockHTTPClient
-		roles      roleAPI
-
-		ctx   = context.Background()
-		setup = func() {
-			mockClient = &mockHTTPClient{}
-			roles = roleAPI{mockClient}
-		}
-	)
-
 	t.Run("success", func(t *testing.T) {
-		setup()
-		mockClient.GetFunc = func(ctx context.Context, path string) ([]byte, error) {
-			if exp := "/Services/SID/Roles/ROLESID"; exp != path {
+		client := &HTTPClientMock{}
+		client.GetFunc = func(ctx context.Context, path string) ([]byte, error) {
+			if exp := "/Services/sid/Roles/rolesid"; exp != path {
 				t.Errorf("exp path %s, got %s", exp, path)
 			}
 			return ioutil.ReadFile("fixtures/role.json")
@@ -41,7 +28,7 @@ func TestRoleRead(t *testing.T) {
 		)
 		json.NewDecoder(f).Decode(&exp)
 
-		role, err := roles.Read(ctx, "SID", "ROLESID")
+		role, err := roleAPI{client}.Read(context.TODO(), "sid", "rolesid")
 		if err != nil {
 			t.Errorf("exp no err, got %v", err)
 		}
@@ -50,72 +37,24 @@ func TestRoleRead(t *testing.T) {
 		}
 	})
 
-	t.Run("response parsing body error", func(t *testing.T) {
-		setup()
-		mockClient.GetFunc = func(ctx context.Context, path string) ([]byte, error) {
-			return []byte("invalid"), nil
+	t.Run("errors", func(t *testing.T) {
+		fn := func(ctx context.Context, client *HTTPClientMock) (interface{}, error) {
+			return roleAPI{client}.Read(ctx, "sid", "roleSid")
 		}
-
-		if _, err := roles.Read(ctx, "SID", "ROLESID"); err == nil {
-			t.Errorf("exp parsing err, got %v", err)
-		}
-	})
-
-	t.Run("api response error", func(t *testing.T) {
-		setup()
-		mockClient.GetFunc = func(ctx context.Context, path string) ([]byte, error) {
-			return nil, twilio.ErrTwilioResponse{}
-		}
-
-		exp := twilio.ErrTwilioResponse{}
-		if _, err := roles.Read(ctx, "SID", "ROLESID"); err != exp {
-			t.Errorf("exp err %v, got %v", exp, err)
-		}
-	})
-
-	t.Run("api request ctx timeout", func(t *testing.T) {
-		setup()
-		mockClient.GetFunc = func(ctx context.Context, path string) ([]byte, error) {
-			select {
-			case <-time.After(time.Second * 1):
-				break
-			case <-ctx.Done():
-				return nil, ctx.Err()
-			}
-			return nil, nil
-		}
-
-		ctx, cancelFn := context.WithTimeout(ctx, 1*time.Microsecond)
-		defer cancelFn()
-
-		exp := context.DeadlineExceeded
-		if _, err := roles.Read(ctx, "SID", "ROLESID"); err != exp {
-			t.Errorf("exp err %v, got %v", exp, err)
-		}
+		APIMock(fn).TestGets((t))
 	})
 }
 
 func TestRoleCreate(t *testing.T) {
-	var (
-		mockClient *mockHTTPClient
-		roles      roleAPI
-
-		ctx   = context.Background()
-		setup = func() {
-			mockClient = &mockHTTPClient{}
-			roles = roleAPI{mockClient}
-		}
-	)
-
 	t.Run("success", func(t *testing.T) {
-		setup()
-		mockClient.PostFunc = func(ctx context.Context, path string, body io.Reader) ([]byte, error) {
+		client := &HTTPClientMock{}
+		client.PostFunc = func(ctx context.Context, path string, body io.Reader) ([]byte, error) {
 			var (
 				gotBody, _ = ioutil.ReadAll(body)
 				expBody    = []byte("FriendlyName=&Type=")
 			)
 
-			if exp := "/Services/SID/Roles"; exp != path {
+			if exp := "/Services/sid/Roles"; exp != path {
 				t.Errorf("exp path %s, got %s", exp, path)
 			}
 			if !bytes.Equal(gotBody, expBody) {
@@ -130,7 +69,7 @@ func TestRoleCreate(t *testing.T) {
 		)
 		json.NewDecoder(f).Decode(&exp)
 
-		role, err := roles.Create(ctx, "SID", RoleCreateParams{})
+		role, err := roleAPI{client}.Create(context.TODO(), "sid", RoleCreateParams{})
 		if err != nil {
 			t.Errorf("exp no err, got %v", err)
 		}
@@ -139,60 +78,24 @@ func TestRoleCreate(t *testing.T) {
 		}
 	})
 
-	t.Run("response parsing body error", func(t *testing.T) {
-		setup()
-		mockClient.PostFunc = func(ctx context.Context, path string, body io.Reader) ([]byte, error) {
-			return []byte("invalid"), nil
+	t.Run("errors", func(t *testing.T) {
+		fn := func(ctx context.Context, client *HTTPClientMock) (interface{}, error) {
+			return (roleAPI{client}).Create(ctx, "sid", RoleCreateParams{})
 		}
-
-		if _, err := roles.Create(ctx, "SID", RoleCreateParams{}); err == nil {
-			t.Errorf("exp parsing err, got %v", err)
-		}
-	})
-
-	t.Run("api request ctx timeout", func(t *testing.T) {
-		setup()
-		mockClient.PostFunc = func(ctx context.Context, path string, body io.Reader) ([]byte, error) {
-			select {
-			case <-time.After(time.Second * 1):
-				break
-			case <-ctx.Done():
-				return nil, ctx.Err()
-			}
-			return nil, nil
-		}
-
-		ctx, cancelFn := context.WithTimeout(ctx, 1*time.Microsecond)
-		defer cancelFn()
-
-		exp := context.DeadlineExceeded
-		if _, err := roles.Create(ctx, "SID", RoleCreateParams{}); err != exp {
-			t.Errorf("exp err %v, got %v", exp, err)
-		}
+		APIMock(fn).TestPosts((t))
 	})
 }
 
 func TestRoleUpdate(t *testing.T) {
-	var (
-		mockClient *mockHTTPClient
-		roles      roleAPI
-
-		ctx   = context.Background()
-		setup = func() {
-			mockClient = &mockHTTPClient{}
-			roles = roleAPI{mockClient}
-		}
-	)
-
 	t.Run("success", func(t *testing.T) {
-		setup()
-		mockClient.PostFunc = func(ctx context.Context, path string, body io.Reader) ([]byte, error) {
+		client := &HTTPClientMock{}
+		client.PostFunc = func(ctx context.Context, path string, body io.Reader) ([]byte, error) {
 			var (
 				gotBody, _ = ioutil.ReadAll(body)
 				expBody    = []byte("Permission=A&Permission=B")
 			)
 
-			if exp := "/Services/SID/Roles/ROLESID"; exp != path {
+			if exp := "/Services/sid/Roles/rolesid"; exp != path {
 				t.Errorf("exp path %s, got %s", exp, path)
 			}
 			if !bytes.Equal(expBody, gotBody) {
@@ -206,7 +109,7 @@ func TestRoleUpdate(t *testing.T) {
 		)
 		json.NewDecoder(f).Decode(&exp)
 
-		role, err := roles.Update(ctx, "SID", "ROLESID", RoleUpdateParams{[]string{"A", "B"}})
+		role, err := (roleAPI{client}).Update(context.TODO(), "sid", "rolesid", RoleUpdateParams{[]string{"A", "B"}})
 		if err != nil {
 			t.Errorf("exp no err, got %v", err)
 		}
@@ -214,72 +117,37 @@ func TestRoleUpdate(t *testing.T) {
 			t.Errorf("response diff %v", cmp.Diff(exp, role))
 		}
 	})
-
-	t.Run("api request ctx timeout", func(t *testing.T) {
-		setup()
-		mockClient.PostFunc = func(ctx context.Context, path string, body io.Reader) ([]byte, error) {
-			select {
-			case <-time.After(time.Second * 1):
-				break
-			case <-ctx.Done():
-				return nil, ctx.Err()
-			}
-			return nil, nil
+	t.Run("errors", func(t *testing.T) {
+		fn := func(ctx context.Context, client *HTTPClientMock) (interface{}, error) {
+			return (roleAPI{client}).Update(ctx, "sid", "roleSid", RoleUpdateParams{})
 		}
-
-		ctx, cancelFn := context.WithTimeout(ctx, 1*time.Microsecond)
-		defer cancelFn()
-
-		exp := context.DeadlineExceeded
-		if _, err := roles.Update(ctx, "SID", "ROLESID", RoleUpdateParams{}); err != exp {
-			t.Errorf("exp err %v, got %v", exp, err)
-		}
+		APIMock(fn).TestPosts((t))
 	})
 }
 
 func TestRoleDelete(t *testing.T) {
-	var (
-		mockClient *mockHTTPClient
-		roles      roleAPI
-
-		ctx   = context.Background()
-		setup = func() {
-			mockClient = &mockHTTPClient{}
-			roles = roleAPI{mockClient}
-		}
-	)
-
 	t.Run("success", func(t *testing.T) {
-		setup()
-		mockClient.DeleteFunc = func(ctx context.Context, path string) ([]byte, error) {
-			if exp := "/Services/SID/Roles/ROLESID"; exp != path {
+		client := &HTTPClientMock{}
+		client.DeleteFunc = func(ctx context.Context, path string) ([]byte, error) {
+			if exp := "/Services/sid/Roles/rolesid"; exp != path {
 				t.Errorf("exp path %s, got %s", exp, path)
 			}
 			return nil, nil
 		}
-		if err := roles.Delete(ctx, "SID", "ROLESID"); err != nil {
+
+		if err := (roleAPI{client}).Delete(context.TODO(), "sid", "rolesid"); err != nil {
 			t.Errorf("exp no err, got %v", err)
+		}
+		if !client.DeleteInvoked {
+			t.Errorf("exp delete to have been invoked")
 		}
 	})
 
-	t.Run("api request ctx timeout", func(t *testing.T) {
-		setup()
-		mockClient.DeleteFunc = func(ctx context.Context, path string) ([]byte, error) {
-			select {
-			case <-time.After(time.Second * 1):
-				break
-			case <-ctx.Done():
-				return nil, ctx.Err()
-			}
-			return nil, nil
+	t.Run("errors", func(t *testing.T) {
+		fn := func(ctx context.Context, client *HTTPClientMock) (interface{}, error) {
+			err := (roleAPI{client}).Delete(ctx, "sid", "rolesid")
+			return nil, err
 		}
-
-		ctx, cancel := context.WithTimeout(ctx, 1*time.Microsecond)
-		defer cancel()
-
-		exp := context.DeadlineExceeded
-		if err := roles.Delete(ctx, "SID", "ROLESID"); err != exp {
-			t.Errorf("exp err %v, got %v", exp, err)
-		}
+		APIMock(fn).TestDeletes((t))
 	})
 }

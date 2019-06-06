@@ -20,31 +20,40 @@ func (e ErrTwilioResponse) Error() string {
 // Context store for credentials, configuration and the http client.
 type Context struct {
 	AccountSID string
-	AuthToken  string
-	Region     string
+
+	// APIKey contains a secret used to sign Access Tokens.
+	APIKey    string
+	APISecret string
+
+	Region string
+
 	HTTPClient RequestHandler
 }
 
-// NewContext store the various credentials into a `twilio.Context` instance and
-// sets `http.DefaultClient` as HTTPClient.
+// NewContext returns a new Context with a http.DefaultClient and various informations
+// loaded from envs.
 func NewContext() Context {
-	return NewContextWithHTTP("", "", "", http.DefaultClient)
+	return NewContextWithHTTP("", "", "", "", http.DefaultClient)
 }
 
 // NewContextWithHTTP sames as `NewContext` but requires a `twilio.RequestHandler`.
-func NewContextWithHTTP(accountSID, authToken, region string, httpClient RequestHandler) Context {
+func NewContextWithHTTP(accountSID, apiKey, apiSecret, region string, httpClient RequestHandler) Context {
 	if accountSID == "" {
 		accountSID = os.Getenv("TWILIO_ACCOUNT_SID")
 	}
-	if authToken == "" {
-		authToken = os.Getenv("TWILIO_SECRET_KEY")
+	if apiKey == "" {
+		apiKey = os.Getenv("TWILIO_API_KEY")
+	}
+	if apiSecret == "" {
+		apiSecret = os.Getenv("TWILIO_API_SECRET_KEY")
 	}
 	if region == "" {
-		region = os.Getenv("TWILIO_REGION")
+		region = os.Getenv("TWILIO_API_REGION")
 	}
 	return Context{
 		AccountSID: accountSID,
-		AuthToken:  authToken,
+		APIKey:     apiKey,
+		APISecret:  apiSecret,
 		Region:     region,
 		HTTPClient: httpClient,
 	}

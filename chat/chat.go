@@ -28,8 +28,8 @@ func New(tctx twilio.Context) (Chat, error) {
 	var chatClient Chat
 
 	client, err := twilio.NewHTTPClient(
-		tctx.AccountSID,
-		tctx.AuthToken,
+		tctx.APIKey,
+		tctx.APISecret,
 		chatEndpointForRegion(tctx.Region),
 		tctx.HTTPClient,
 	)
