@@ -27,7 +27,7 @@ type Context struct {
 
 	Region string
 
-	HTTPClient RequestHandler
+	RequestHandler RequestHandler
 }
 
 // NewContext returns a new Context with a http.DefaultClient and various informations
@@ -37,7 +37,7 @@ func NewContext() Context {
 }
 
 // NewContextWithHTTP sames as `NewContext` but requires a `twilio.RequestHandler`.
-func NewContextWithHTTP(accountSID, apiKey, apiSecret, region string, httpClient RequestHandler) Context {
+func NewContextWithHTTP(accountSID, apiKey, apiSecret, region string, reqHandler RequestHandler) Context {
 	if accountSID == "" {
 		accountSID = os.Getenv("TWILIO_ACCOUNT_SID")
 	}
@@ -51,10 +51,10 @@ func NewContextWithHTTP(accountSID, apiKey, apiSecret, region string, httpClient
 		region = os.Getenv("TWILIO_API_REGION")
 	}
 	return Context{
-		AccountSID: accountSID,
-		APIKey:     apiKey,
-		APISecret:  apiSecret,
-		Region:     region,
-		HTTPClient: httpClient,
+		AccountSID:     accountSID,
+		APIKey:         apiKey,
+		APISecret:      apiSecret,
+		Region:         region,
+		RequestHandler: reqHandler,
 	}
 }

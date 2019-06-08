@@ -10,7 +10,7 @@ import (
 )
 
 type (
-	// ServiceRepository defines the interface for interacting with chat service api.
+	// ServiceRepository interface for interacting with the service chat api.
 	ServiceRepository interface {
 		Read(ctx context.Context, serviceSID string) (Service, error)
 		Create(ctx context.Context, body ServiceCreateParams) (Service, error)

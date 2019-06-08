@@ -10,7 +10,7 @@ import (
 )
 
 type (
-	// RoleRepository defines the interface for interacting with the chat role api.
+	// RoleRepository interface for interacting with the role chat api.
 	RoleRepository interface {
 		Read(ctx context.Context, serviceSID, roleSID string) (Role, error)
 		Create(ctx context.Context, serviceSID string, body RoleCreateParams) (Role, error)

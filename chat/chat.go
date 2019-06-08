@@ -9,17 +9,16 @@ import (
 
 // Chat programmable chat interface
 type Chat struct {
-	Bindings     interface{}
-	Channels     interface{}
+	Bindings     BindingResource
+	Channels     ChannelResource
 	Credentials  interface{}
 	Members      interface{}
 	Invites      interface{}
 	Messages     interface{}
 	Roles        RoleResource
 	Services     ServiceResource
-	Users        interface{}
-	UserChannels interface{}
-	Media        interface{}
+	Users        UserResource
+	UserChannels UserChannelResource
 }
 
 // New returns a chat instance with a base url set to `https://chat.twilio.com/v2`
@@ -31,7 +30,7 @@ func New(tctx twilio.Context) (Chat, error) {
 		tctx.APIKey,
 		tctx.APISecret,
 		chatEndpointForRegion(tctx.Region),
-		tctx.HTTPClient,
+		tctx.RequestHandler,
 	)
 	if err != nil {
 		return chatClient, err

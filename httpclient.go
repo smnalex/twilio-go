@@ -11,35 +11,34 @@ import (
 	"github.com/pkg/errors"
 )
 
-// HTTPClient provides the API operation methods for making requests to Twilio.
+// HTTPClient provides http methods required for making requests to the Twilio API.
 type HTTPClient interface {
 	Get(context.Context, string) ([]byte, error)
 	Post(context.Context, string, io.Reader) ([]byte, error)
 	Delete(context.Context, string) ([]byte, error)
 }
 
-// RequestHandler abstracts `http.Client`.
+// RequestHandler defines the method required for an HTTP client to execute requests.
+// An *http.Client satisfies this interface.
 type RequestHandler interface {
 	Do(*http.Request) (*http.Response, error)
 }
 
-type apiClient struct {
+type httpClient struct {
 	url       *url.URL
 	apiKey    string
 	apiSecret string
 	RequestHandler
 }
 
-// NewHTTPClient returns a new twilio.Client which can be used to access various
-// twilio apis. It requires a custom type `twilio.RequestHandler` which has the
-// method signature of the `http.Client` struct `Do` method.
+// NewHTTPClient returns a new HTTPClient customised for making Twilio http requests.
 func NewHTTPClient(apiKey, apiSecret, baseURL string, rh RequestHandler) (HTTPClient, error) {
 	url, err := url.Parse(baseURL)
 	if err != nil {
 		return nil, errors.Wrap(err, "could not parse url")
 	}
 
-	return &apiClient{
+	return &httpClient{
 		url:            url,
 		apiKey:         apiKey,
 		apiSecret:      apiSecret,
@@ -47,19 +46,19 @@ func NewHTTPClient(apiKey, apiSecret, baseURL string, rh RequestHandler) (HTTPCl
 	}, nil
 }
 
-func (client *apiClient) Get(ctx context.Context, path string) ([]byte, error) {
+func (client *httpClient) Get(ctx context.Context, path string) ([]byte, error) {
 	return client.request(ctx, http.MethodGet, path, nil)
 }
 
-func (client *apiClient) Post(ctx context.Context, path string, body io.Reader) ([]byte, error) {
+func (client *httpClient) Post(ctx context.Context, path string, body io.Reader) ([]byte, error) {
 	return client.request(ctx, http.MethodPost, path, body)
 }
 
-func (client *apiClient) Delete(ctx context.Context, path string) ([]byte, error) {
+func (client *httpClient) Delete(ctx context.Context, path string) ([]byte, error) {
 	return client.request(ctx, http.MethodDelete, path, nil)
 }
 
-func (client *apiClient) request(ctx context.Context, method, path string, body io.Reader) ([]byte, error) {
+func (client *httpClient) request(ctx context.Context, method, path string, body io.Reader) ([]byte, error) {
 	req, err := http.NewRequest(method, client.url.String()+path, body)
 	if err != nil {
 		return nil, errors.Wrap(err, "httpclient: could not create request")

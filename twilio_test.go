@@ -1,18 +1,18 @@
 package twilio
 
 import (
+	"fmt"
+	"net/http"
 	"os"
 	"testing"
-	"net/http"
-	"fmt"
 )
 
 func TestNewContext(t *testing.T) {
 	var (
-		acc = "acc"
-		apiKey = "auth"
+		acc       = "acc"
+		apiKey    = "auth"
 		apiSecret = "secret"
-		region = "region"
+		region    = "region"
 
 		setup = func() func() {
 			os.Setenv("TWILIO_ACCOUNT_SID", acc)
@@ -45,8 +45,8 @@ func TestNewContext(t *testing.T) {
 	if c.Region != region {
 		t.Errorf("exp auth %s, got %s", auth, c.Region)
 	}
-	if c.HTTPClient != http.DefaultClient {
-		t.Errorf("exp *http.Client, got %T", c.HTTPClient)
+	if c.RequestHandler != http.DefaultClient {
+		t.Errorf("exp *http.Client, got %T", c.RequestHandler)
 	}
 }
 
