@@ -12,81 +12,40 @@ import (
 	"github.com/google/go-cmp/cmp"
 )
 
-func TestUserRead(t *testing.T) {
+func TestMessageRead(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
 		client := &HTTPClientMock{}
 		client.GetFunc = func(ctx context.Context, path string) ([]byte, error) {
-			if exp := "/Services/sid/Users/identity"; exp != path {
+			if exp := "/Services/sid/Channels/csid/Messages/msid"; exp != path {
 				t.Errorf("exp path %s, got %s", exp, path)
 			}
-			return ioutil.ReadFile("fixtures/user.json")
+			return ioutil.ReadFile("fixtures/message.json")
 		}
 
 		var (
-			exp  = User{}
-			f, _ = os.Open("fixtures/user.json")
+			exp  = Message{}
+			f, _ = os.Open("fixtures/message.json")
 		)
 		json.NewDecoder(f).Decode(&exp)
 
-		user, err := (userAPI{client}).Read(context.TODO(), "sid", "identity")
+		message, err := messageAPI{client}.Read(context.TODO(), "sid", "csid", "msid")
 		if err != nil {
 			t.Errorf("exp no err, got %v", err)
 		}
-		if !cmp.Equal(exp, user) {
-			t.Errorf("response diff %v", cmp.Diff(exp, user))
+		if !cmp.Equal(exp, message) {
+			t.Errorf("response diff %v", cmp.Diff(exp, message))
 		}
 	})
 
 	t.Run("errors", func(t *testing.T) {
 		fn := func(ctx context.Context, client *HTTPClientMock) (interface{}, error) {
-			return (userAPI{client}).Read(ctx, "sid", "identity")
+			return messageAPI{client}.Read(ctx, "sid", "csid", "msid")
 		}
 		APIMock(fn).TestGets((t))
 	})
 }
 
-func TestUserCreate(t *testing.T) {
-	t.Run("success", func(t *testing.T) {
-		client := &HTTPClientMock{}
-		client.PostFunc = func(ctx context.Context, path string, body io.Reader) ([]byte, error) {
-			var (
-				gotBody, _ = ioutil.ReadAll(body)
-				expBody    = []byte("Identity=")
-			)
-
-			if exp := "/Services/sid/Users"; exp != path {
-				t.Errorf("exp path %s, got %s", exp, path)
-			}
-			if !bytes.Equal(gotBody, expBody) {
-				t.Errorf("exp body %s, got %s", expBody, gotBody)
-			}
-			return ioutil.ReadFile("fixtures/user.json")
-		}
-
-		var (
-			exp  User
-			f, _ = os.Open("fixtures/user.json")
-		)
-		json.NewDecoder(f).Decode(&exp)
-
-		user, err := (userAPI{client}).Create(context.TODO(), "sid", UserCreateParams{})
-		if err != nil {
-			t.Errorf("exp no err, got %v", err)
-		}
-		if !cmp.Equal(exp, user) {
-			t.Errorf("response diff %v", cmp.Diff(exp, user))
-		}
-	})
-
-	t.Run("errors", func(t *testing.T) {
-		fn := func(ctx context.Context, client *HTTPClientMock) (interface{}, error) {
-			return (userAPI{client}).Create(ctx, "sid", UserCreateParams{})
-		}
-		APIMock(fn).TestPosts((t))
-	})
-}
-
-func TestUserUpdate(t *testing.T) {
+func TestMessageSend(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
 		client := &HTTPClientMock{}
 		client.PostFunc = func(ctx context.Context, path string, body io.Reader) ([]byte, error) {
@@ -95,56 +54,98 @@ func TestUserUpdate(t *testing.T) {
 				expBody    = []byte("")
 			)
 
-			if exp := "/Services/sid/Users/userSid"; exp != path {
+			if exp := "/Services/sid/Channels/csid/Messages"; exp != path {
 				t.Errorf("exp path %s, got %s", exp, path)
 			}
-			if !bytes.Equal(expBody, gotBody) {
-				t.Errorf("exp req body %s, got %s", expBody, gotBody)
+			if !bytes.Equal(gotBody, expBody) {
+				t.Errorf("exp body %s, got %s", expBody, gotBody)
 			}
-			return ioutil.ReadFile("fixtures/user.json")
+			return ioutil.ReadFile("fixtures/message.json")
 		}
 
 		var (
-			exp  User
-			f, _ = os.Open("fixtures/user.json")
+			exp  Message
+			f, _ = os.Open("fixtures/message.json")
 		)
 		json.NewDecoder(f).Decode(&exp)
 
-		user, err := (userAPI{client}).Update(context.TODO(), "sid", "userSid", UserUpdateParams{})
+		message, err := messageAPI{client}.Send(context.TODO(), "sid", "csid", MessageCreateParams{})
 		if err != nil {
 			t.Errorf("exp no err, got %v", err)
 		}
-		if !cmp.Equal(exp, user) {
-			t.Errorf("response diff %v", cmp.Diff(exp, user))
+		if !cmp.Equal(exp, message) {
+			t.Errorf("response diff %v", cmp.Diff(exp, message))
 		}
 	})
 
 	t.Run("errors", func(t *testing.T) {
 		fn := func(ctx context.Context, client *HTTPClientMock) (interface{}, error) {
-			return (userAPI{client}).Update(ctx, "sid", "userSid", UserUpdateParams{})
+			return (messageAPI{client}).Send(ctx, "sid", "csid", MessageCreateParams{})
 		}
 		APIMock(fn).TestPosts((t))
 	})
 }
 
-func TestUserDelete(t *testing.T) {
+func TestMessageUpdate(t *testing.T) {
+	t.Run("success", func(t *testing.T) {
+		client := &HTTPClientMock{}
+		client.PostFunc = func(ctx context.Context, path string, body io.Reader) ([]byte, error) {
+			var (
+				gotBody, _ = ioutil.ReadAll(body)
+				expBody    = []byte("")
+			)
+
+			if exp := "/Services/sid/Channels/csid/Messages/msid"; exp != path {
+				t.Errorf("exp path %s, got %s", exp, path)
+			}
+			if !bytes.Equal(expBody, gotBody) {
+				t.Errorf("exp req body %s, got %s", expBody, gotBody)
+			}
+			return ioutil.ReadFile("fixtures/message.json")
+		}
+		var (
+			exp  Message
+			f, _ = os.Open("fixtures/message.json")
+		)
+		json.NewDecoder(f).Decode(&exp)
+
+		role, err := (messageAPI{client}).Update(context.TODO(), "sid", "csid", "msid", MessageUpdateParams{})
+		if err != nil {
+			t.Errorf("exp no err, got %v", err)
+		}
+		if !cmp.Equal(exp, role) {
+			t.Errorf("response diff %v", cmp.Diff(exp, role))
+		}
+	})
+	t.Run("errors", func(t *testing.T) {
+		fn := func(ctx context.Context, client *HTTPClientMock) (interface{}, error) {
+			return (messageAPI{client}).Update(ctx, "sid", "csid", "msid", MessageUpdateParams{})
+		}
+		APIMock(fn).TestPosts((t))
+	})
+}
+
+func TestUpdateDelete(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
 		client := &HTTPClientMock{}
 		client.DeleteFunc = func(ctx context.Context, path string) ([]byte, error) {
-			if exp := "/Services/sid/Users/userSid"; exp != path {
+			if exp := "/Services/sid/Channels/csid/Messages/msid"; exp != path {
 				t.Errorf("exp path %s, got %s", exp, path)
 			}
 			return nil, nil
 		}
 
-		if err := (userAPI{client}).Delete(context.TODO(), "sid", "userSid"); err != nil {
+		if err := (messageAPI{client}).Delete(context.TODO(), "sid", "csid", "msid"); err != nil {
 			t.Errorf("exp no err, got %v", err)
+		}
+		if !client.DeleteInvoked {
+			t.Errorf("exp delete to have been invoked")
 		}
 	})
 
 	t.Run("errors", func(t *testing.T) {
 		fn := func(ctx context.Context, client *HTTPClientMock) (interface{}, error) {
-			err := (userAPI{client}).Delete(ctx, "sid", "userSid")
+			err := (messageAPI{client}).Delete(ctx, "sid", "csid", "msid")
 			return nil, err
 		}
 		APIMock(fn).TestDeletes((t))

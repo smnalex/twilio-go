@@ -8,17 +8,9 @@ import (
 	"github.com/smnalex/twilio-go"
 )
 
-type (
-	// BindingRepository interface for interacting with the binding chat api.
-	BindingRepository interface {
-		Read(ctx context.Context, serviceSID, bindingSID string) (Binding, error)
-		Delete(ctx context.Context, serviceSID, bindingSID string) error
-	}
-
-	bindingAPI struct {
-		client twilio.HTTPClient
-	}
-)
+type bindingAPI struct {
+	client twilio.HTTPClient
+}
 
 // GET /Services/{Service SID}/Bindings/{Binding SID}
 // https://www.twilio.com/docs/chat/rest/bindings-resource#read-a-binding

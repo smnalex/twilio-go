@@ -2,13 +2,53 @@ package main
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"log"
+	"time"
 
 	"github.com/smnalex/twilio-go"
 	"github.com/smnalex/twilio-go/chat"
 )
+
+// TwilioRoleResource interface for twilio roles creation and retrieval.
+type TwilioRoleResource interface {
+	Read(ctx context.Context, serviceSID, roleSID string) (chat.Role, error)
+	Create(ctx context.Context, serviceSID string, body chat.RoleCreateParams) (chat.Role, error)
+}
+
+// TwilioChannelResource interface for twilio channel reads
+type TwilioChannelResource interface {
+	Read(ctx context.Context, serviceSID, identity string) (chat.Channel, error)
+}
+
+type twilioService struct {
+	tcr TwilioChannelResource
+	trr TwilioRoleResource
+}
+
+func (ts twilioService) createRole(sid string) {
+	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
+	defer cancel()
+	role, err := ts.trr.Create(ctx, sid, chat.RoleCreateParams{
+		FriendlyName: "Test",
+	})
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	fmt.Printf("%+v", role)
+}
+
+func (ts twilioService) readChannel(sid, csid string) {
+	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
+	defer cancel()
+	role, err := ts.tcr.Read(ctx, sid, csid)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	fmt.Printf("%+v", role)
+}
 
 func main() {
 	tctx := twilio.NewContext()
@@ -16,27 +56,10 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	sid := "ISXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
-	role, err := client.Roles.Create(context.Background(), sid, chat.RoleCreateParams{
-		FriendlyName: "test-1234",
-		Type:         "deployment",
-		Permission:   []string{"createChannel", "joinChannel"},
-	})
-	if err != nil {
-		log.Fatal(err)
+	ts := twilioService{
+		tcr: client.Channels,
+		trr: client.Roles,
 	}
-	data, _ := json.MarshalIndent(role, "", "\t")
-	fmt.Printf("%s\n", data)
-
-	role, err = client.Roles.Update(context.Background(), role.ServiceSID, role.SID, chat.RoleUpdateParams{
-		Permission: []string{"destroyChannel"},
-	})
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	err = client.Roles.Delete(context.Background(), role.ServiceSID, role.SID)
-	if err != nil {
-		log.Fatal(err)
-	}
+	ts.createRole("ServiceSID")
+	ts.readChannel("ServiceSID", "ChannelSID")
 }

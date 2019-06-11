@@ -9,10 +9,11 @@ import (
 
 // RoleResource handles interactions with Roles Programmable Chat REST API.
 type RoleResource struct {
-	RoleRepository
+	roleAPI
 }
 
-// Role holds a role information.
+// Role represents what a user can do within a Chat Service instance.
+// Roles are either Service scoped or Channel scoped.
 type Role struct {
 	SID          string   `json:"sid,omitempty"`
 	AccountSID   string   `json:"account_sid,omitempty"`

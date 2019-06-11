@@ -9,7 +9,7 @@ import (
 
 // ServiceResource handles interactions with Services Programmable Chat REST API.
 type ServiceResource struct {
-	ServiceRepository
+	serviceAPI
 }
 
 // Service holds a service information.

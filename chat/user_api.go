@@ -9,19 +9,9 @@ import (
 	"github.com/smnalex/twilio-go"
 )
 
-type (
-	// UserRepository interface for interacting with the user chat api.
-	UserRepository interface {
-		Read(ctx context.Context, serviceSid, identity string) (User, error)
-		Create(ctx context.Context, serviceSid string, body UserCreateParams) (User, error)
-		Update(ctx context.Context, serviceSid string, userSid string, body UserUpdateParams) (User, error)
-		Delete(ctx context.Context, serviceSid, userSid string) (User, error)
-	}
-
-	userAPI struct {
-		client twilio.HTTPClient
-	}
-)
+type userAPI struct {
+	client twilio.HTTPClient
+}
 
 // GET /Services/{Service SID}/Users/{Identity}
 // GET /Services/{Service SID}/Users/{User SID}

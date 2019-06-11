@@ -9,19 +9,9 @@ import (
 	"github.com/smnalex/twilio-go"
 )
 
-type (
-	// ChannelRepository interface for interacting with the channel chat api.
-	ChannelRepository interface {
-		Read(ctx context.Context, serviceSID, identity string) (Channel, error)
-		Create(ctx context.Context, serviceSID string, body ChannelCreateParams) (Channel, error)
-		Update(ctx context.Context, serviceSID, identity string, body ChannelUpdateParams) (Channel, error)
-		Delete(ctx context.Context, serviceSID, identity string) error
-	}
-
-	channelAPI struct {
-		client twilio.HTTPClient
-	}
-)
+type channelAPI struct {
+	client twilio.HTTPClient
+}
 
 // GET /Services/{Service SID}/Channels/{Channel SID}
 // GET /Services/{Service SID}/Channels/{Unique Name}

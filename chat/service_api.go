@@ -9,19 +9,9 @@ import (
 	"github.com/smnalex/twilio-go"
 )
 
-type (
-	// ServiceRepository interface for interacting with the service chat api.
-	ServiceRepository interface {
-		Read(ctx context.Context, serviceSID string) (Service, error)
-		Create(ctx context.Context, body ServiceCreateParams) (Service, error)
-		Update(ctx context.Context, serviceSID string, body ServiceUpdateParams) (Service, error)
-		Delete(ctx context.Context, serviceSID string) error
-	}
-
-	serviceAPI struct {
-		client twilio.HTTPClient
-	}
-)
+type serviceAPI struct {
+	client twilio.HTTPClient
+}
 
 // GET /Services/{Service SID}
 // https://www.twilio.com/docs/chat/rest/services#retrieve-a-service

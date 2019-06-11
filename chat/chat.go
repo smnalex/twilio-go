@@ -14,7 +14,7 @@ type Chat struct {
 	Credentials  interface{}
 	Members      interface{}
 	Invites      interface{}
-	Messages     interface{}
+	Messages     MessageResource
 	Roles        RoleResource
 	Services     ServiceResource
 	Users        UserResource
@@ -37,8 +37,13 @@ func New(tctx twilio.Context) (Chat, error) {
 	}
 
 	{
+		chatClient.Bindings = BindingResource{bindingAPI{client}}
+		chatClient.Channels = ChannelResource{channelAPI{client}}
+		chatClient.Messages = MessageResource{messageAPI{client}}
 		chatClient.Roles = RoleResource{roleAPI{client}}
 		chatClient.Services = ServiceResource{serviceAPI{client}}
+		chatClient.Users = UserResource{userAPI{client}}
+		chatClient.UserChannels = UserChannelResource{userChannelAPI{client}}
 	}
 	return chatClient, nil
 }

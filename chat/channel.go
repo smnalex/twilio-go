@@ -10,7 +10,7 @@ import (
 
 // ChannelResource handles interactions with Channels Programmable Chat REST API.
 type ChannelResource struct {
-	ChannelRepository
+	channelAPI
 }
 
 // Channel resource of Programmable Chat represents a "chat room".

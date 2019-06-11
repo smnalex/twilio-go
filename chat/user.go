@@ -10,7 +10,7 @@ import (
 
 // UserResource handles interactions with Users Programmable Chat REST API.
 type UserResource struct {
-	UserRepository
+	userAPI
 }
 
 // User resource of Programmable Chat represents a particular user represented by

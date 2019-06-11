@@ -9,19 +9,9 @@ import (
 	"github.com/smnalex/twilio-go"
 )
 
-type (
-	// RoleRepository interface for interacting with the role chat api.
-	RoleRepository interface {
-		Read(ctx context.Context, serviceSID, roleSID string) (Role, error)
-		Create(ctx context.Context, serviceSID string, body RoleCreateParams) (Role, error)
-		Update(ctx context.Context, serviceSID, roleSID string, body RoleUpdateParams) (Role, error)
-		Delete(ctx context.Context, serviceSID, roleSID string) error
-	}
-
-	roleAPI struct {
-		client twilio.HTTPClient
-	}
-)
+type roleAPI struct {
+	client twilio.HTTPClient
+}
 
 // GET /Services/{Service SID}/Roles/{Role SID}
 // https://www.twilio.com/docs/chat/rest/roles#retrieve-a-role
