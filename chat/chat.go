@@ -11,9 +11,9 @@ import (
 type Chat struct {
 	Bindings     BindingResource
 	Channels     ChannelResource
-	Credentials  interface{}
-	Members      interface{}
-	Invites      interface{}
+	Credentials  CredentialResource
+	Members      MemberResource
+	Invites      InviteResource
 	Messages     MessageResource
 	Roles        RoleResource
 	Services     ServiceResource
@@ -39,6 +39,9 @@ func New(tctx twilio.Context) (Chat, error) {
 	{
 		chatClient.Bindings = BindingResource{bindingAPI{client}}
 		chatClient.Channels = ChannelResource{channelAPI{client}}
+		chatClient.Credentials = CredentialResource{credentialAPI{client}}
+		chatClient.Members = MemberResource{memberAPI{client}}
+		chatClient.Invites = InviteResource{inviteAPI{client}}
 		chatClient.Messages = MessageResource{messageAPI{client}}
 		chatClient.Roles = RoleResource{roleAPI{client}}
 		chatClient.Services = ServiceResource{serviceAPI{client}}
