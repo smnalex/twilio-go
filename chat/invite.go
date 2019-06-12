@@ -3,7 +3,6 @@ package chat
 import (
 	"io"
 	"strings"
-	"time"
 
 	"github.com/smnalex/twilio-go"
 )
@@ -15,16 +14,20 @@ type InviteResource struct {
 
 // Invite represents all pending invitations to make Users into Channel Members.
 type Invite struct {
-	AccountSid  string    `json:"account_sid"`
-	ChannelSid  string    `json:"channel_sid"`
-	CreatedBy   string    `json:"created_by"`
-	DateCreated time.Time `json:"date_created"`
-	DateUpdated time.Time `json:"date_updated"`
-	Identity    string    `json:"identity"`
-	RoleSid     string    `json:"role_sid"`
-	ServiceSid  string    `json:"service_sid"`
-	Sid         string    `json:"sid"`
-	URL         string    `json:"url"`
+	AccountSid string `json:"account_sid"`
+	ChannelSid string `json:"channel_sid"`
+	CreatedBy  string `json:"created_by"`
+
+	// DateCreated ISO-8601 format.
+	DateCreated string `json:"date_created"`
+
+	// DateUpdated ISO-8601 format.
+	DateUpdated string `json:"date_updated"`
+	Identity    string `json:"identity"`
+	RoleSid     string `json:"role_sid"`
+	ServiceSid  string `json:"service_sid"`
+	Sid         string `json:"sid"`
+	URL         string `json:"url"`
 }
 
 // InviteCreateParams holds information used in creating a new invite.

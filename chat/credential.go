@@ -3,7 +3,6 @@ package chat
 import (
 	"io"
 	"strings"
-	"time"
 
 	"github.com/smnalex/twilio-go"
 )
@@ -16,14 +15,18 @@ type CredentialResource struct {
 // Credential resource represents one credential record for a particular push notifications channel.
 // Currently APNS, FCM and GCM types are supported.
 type Credential struct {
-	Sid          string    `json:"sid"`
-	AccountSid   string    `json:"account_sid"`
-	FriendlyName string    `json:"friendly_name"`
-	Type         string    `json:"type"`
-	Sandbox      string    `json:"sandbox"`
-	DateCreated  time.Time `json:"date_created"`
-	DateUpdated  time.Time `json:"date_updated"`
-	URL          string    `json:"url"`
+	Sid          string `json:"sid"`
+	AccountSid   string `json:"account_sid"`
+	FriendlyName string `json:"friendly_name"`
+	Type         string `json:"type"`
+	Sandbox      string `json:"sandbox"`
+
+	// DateCreated ISO-8601 format.
+	DateCreated string `json:"date_created"`
+
+	// DateUpdated ISO-8601 format.
+	DateUpdated string `json:"date_updated"`
+	URL         string `json:"url"`
 }
 
 // CredentialCreateParams holds information used in creating a new credential.
