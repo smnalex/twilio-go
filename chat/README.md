@@ -22,40 +22,6 @@ func main() {
     if err != nil {
         log.Fatal(err)
     }
-
-    // Create a new service
-    // Post https://chat.twilio.com/v2/Services
-    service, err := chat.Services.Create(ctx, ServiceCreateParams{"chat-v1"})
-    if err != nil {
-        log.Fatal(err)
-    }
-
-    // TODO: List services
-    // Get https://chat.twilio.com/v2/Services
-    services, err := chat.Services.List(ctx)
-    if err != nil {
-        log.Fatal(err)
-    }
-
-    // Read a service
-    // Get https://chat.twilio.com/v2/Services/ISXXXXXX
-    service, err := chat.Services.Read(ctx, service.SID)
-    if err != nil {
-        log.Fatal(err)
-    }
-
-    // Update an existing service
-    // Post https://chat.twilio.com/v2/Services/ISXXXXX
-    service, err = chat.Services.Update(ctx, service.SID)
-    if err != nil {
-        log.Fatal(err)
-    }
-
-    // Delete an existing service
-    // Delete https://chat.twilio.com/v2/Services/ISXXXXX
-    err = chat.Services.Delete(ctx, service.SID)
-    if err != nil {
-        log.Fatal(err)
-    }
+    ...
 }
 ```

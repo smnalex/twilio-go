@@ -14,9 +14,9 @@ type bindingAPI struct {
 
 // GET /Services/{Service SID}/Bindings/{Binding SID}
 // https://www.twilio.com/docs/chat/rest/bindings-resource#read-a-binding
-func (api bindingAPI) Read(ctx context.Context, sid, bsid string) (Binding, error) {
+func (api bindingAPI) Read(ctx context.Context, serviceSid, bindingSid string) (Binding, error) {
 	var bind Binding
-	data, err := api.client.Get(ctx, fmt.Sprintf("/Services/%s/Bindings/%s", sid, bsid))
+	data, err := api.client.Get(ctx, fmt.Sprintf("/Services/%s/Bindings/%s", serviceSid, bindingSid))
 	if err != nil {
 		return bind, err
 	}
@@ -24,7 +24,7 @@ func (api bindingAPI) Read(ctx context.Context, sid, bsid string) (Binding, erro
 	return bind, err
 }
 
-func (api bindingAPI) Delete(ctx context.Context, sid, bsid string) error {
-	_, err := api.client.Delete(ctx, fmt.Sprintf("/Services/%s/Bindings/%s", sid, bsid))
+func (api bindingAPI) Delete(ctx context.Context, serviceSid, bindingSid string) error {
+	_, err := api.client.Delete(ctx, fmt.Sprintf("/Services/%s/Bindings/%s", serviceSid, bindingSid))
 	return err
 }

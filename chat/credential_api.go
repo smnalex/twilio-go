@@ -15,9 +15,9 @@ type credentialAPI struct {
 
 // GET /Credentials/{Credential SID}
 // https://www.twilio.com/docs/chat/rest/credentials#retrieve-a-credential
-func (api credentialAPI) Read(ctx context.Context, credentialSID string) (Credential, error) {
+func (api credentialAPI) Read(ctx context.Context, credentialSid string) (Credential, error) {
 	var crd Credential
-	data, err := api.client.Get(ctx, fmt.Sprintf("/Credentials/%s", credentialSID))
+	data, err := api.client.Get(ctx, fmt.Sprintf("/Credentials/%s", credentialSid))
 	if err != nil {
 		return crd, err
 	}
@@ -33,14 +33,14 @@ func (api credentialAPI) Create(ctx context.Context, body CredentialCreateParams
 
 // POST /Credentials/{Credential SID}
 // https://www.twilio.com/docs/chat/rest/credentials#update-a-credential
-func (api credentialAPI) Update(ctx context.Context, credentialSID string, body CredentialUpdateParams) (Credential, error) {
-	return api.post(ctx, fmt.Sprintf("/Credentials/%s", credentialSID), body.encode())
+func (api credentialAPI) Update(ctx context.Context, credentialSid string, body CredentialUpdateParams) (Credential, error) {
+	return api.post(ctx, fmt.Sprintf("/Credentials/%s", credentialSid), body.encode())
 }
 
 // DELETE /Credentials/{Credential SID}
 // https://www.twilio.com/docs/chat/rest/credentials#delete-a-credential
-func (api credentialAPI) Delete(ctx context.Context, credentialSID string) error {
-	_, err := api.client.Delete(ctx, fmt.Sprintf("/Credentials/%s", credentialSID))
+func (api credentialAPI) Delete(ctx context.Context, credentialSid string) error {
+	_, err := api.client.Delete(ctx, fmt.Sprintf("/Credentials/%s", credentialSid))
 	return err
 }
 

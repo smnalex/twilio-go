@@ -5,7 +5,7 @@ import (
 	"io"
 	"strings"
 
-	"github.com/google/go-querystring/query"
+	"github.com/smnalex/twilio-go"
 )
 
 // MessageResource handles interactions with Messages Programmable Chat REST API.
@@ -16,10 +16,10 @@ type MessageResource struct {
 // Message represents a single message within a Channel
 // in a Service instance.
 type Message struct {
-	SID        string `json:"sid"`
-	AccountSID string `json:"account_sid"`
-	ServiceSID string `json:"service_sid"`
-	ChannelSID string `json:"channel_sid"`
+	Sid        string `json:"sid"`
+	AccountSid string `json:"account_sid"`
+	ServiceSid string `json:"service_sid"`
+	ChannelSid string `json:"channel_sid"`
 	From       string `json:"from"`
 	To         string `json:"to"`
 
@@ -54,8 +54,7 @@ type MessageCreateParams struct {
 }
 
 func (mcp MessageCreateParams) encode() io.Reader {
-	v, _ := query.Values(mcp)
-	return strings.NewReader(v.Encode())
+	return strings.NewReader(twilio.Values(mcp).Encode())
 }
 
 // MessageUpdateParams holds information used in updating an existing message.
@@ -72,6 +71,5 @@ type MessageUpdateParams struct {
 }
 
 func (mup MessageUpdateParams) encode() io.Reader {
-	v, _ := query.Values(mup)
-	return strings.NewReader(v.Encode())
+	return strings.NewReader(twilio.Values(mup).Encode())
 }

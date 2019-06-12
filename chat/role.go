@@ -4,7 +4,7 @@ import (
 	"io"
 	"strings"
 
-	"github.com/google/go-querystring/query"
+	"github.com/smnalex/twilio-go"
 )
 
 // RoleResource handles interactions with Roles Programmable Chat REST API.
@@ -15,9 +15,9 @@ type RoleResource struct {
 // Role represents what a user can do within a Chat Service instance.
 // Roles are either Service scoped or Channel scoped.
 type Role struct {
-	SID          string   `json:"sid,omitempty"`
-	AccountSID   string   `json:"account_sid,omitempty"`
-	ServiceSID   string   `json:"service_sid,omitempty"`
+	Sid          string   `json:"sid"`
+	AccountSid   string   `json:"account_sid"`
+	ServiceSid   string   `json:"service_sid"`
 	FriendlyName string   `json:"friendly_name"`
 	Type         string   `json:"type"`
 	Permissions  []string `json:"permissions"`
@@ -40,9 +40,8 @@ type RoleCreateParams struct {
 	Permission []string
 }
 
-func (r RoleCreateParams) encode() io.Reader {
-	v, _ := query.Values(r)
-	return strings.NewReader(v.Encode())
+func (rcp RoleCreateParams) encode() io.Reader {
+	return strings.NewReader(twilio.Values(rcp).Encode())
 }
 
 // RoleUpdateParams holds information used in updating an existing role.
@@ -52,7 +51,6 @@ type RoleUpdateParams struct {
 	Permission []string
 }
 
-func (r RoleUpdateParams) encode() io.Reader {
-	v, _ := query.Values(r)
-	return strings.NewReader(v.Encode())
+func (rup RoleUpdateParams) encode() io.Reader {
+	return strings.NewReader(twilio.Values(rup).Encode())
 }

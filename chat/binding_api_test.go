@@ -37,7 +37,7 @@ func TestBindingRead(t *testing.T) {
 
 	t.Run("errors", func(t *testing.T) {
 		fn := func(ctx context.Context, client *HTTPClientMock) (interface{}, error) {
-			return (bindingAPI{client}).Read(ctx, "sid", "identity")
+			return (bindingAPI{client}).Read(ctx, "sid", "bsid")
 		}
 		APIMock(fn).TestGets((t))
 	})
@@ -64,7 +64,7 @@ func TestBindingDelete(t *testing.T) {
 
 	t.Run("errors", func(t *testing.T) {
 		fn := func(ctx context.Context, client *HTTPClientMock) (interface{}, error) {
-			err := (bindingAPI{client}).Delete(ctx, "sid", "identity")
+			err := (bindingAPI{client}).Delete(ctx, "sid", "bsid")
 			return nil, err
 		}
 		APIMock(fn).TestDeletes((t))

@@ -15,9 +15,9 @@ type roleAPI struct {
 
 // GET /Services/{Service SID}/Roles/{Role SID}
 // https://www.twilio.com/docs/chat/rest/roles#retrieve-a-role
-func (r roleAPI) Read(ctx context.Context, sid, roleSID string) (Role, error) {
+func (r roleAPI) Read(ctx context.Context, serviceSid, roleSid string) (Role, error) {
 	var role Role
-	data, err := r.client.Get(ctx, fmt.Sprintf("/Services/%s/Roles/%s", sid, roleSID))
+	data, err := r.client.Get(ctx, fmt.Sprintf("/Services/%s/Roles/%s", serviceSid, roleSid))
 	if err != nil {
 		return role, err
 	}
@@ -27,20 +27,20 @@ func (r roleAPI) Read(ctx context.Context, sid, roleSID string) (Role, error) {
 
 // POST /Services/{Service SID}/Roles
 // https://www.twilio.com/docs/chat/rest/roles#create-a-role
-func (r roleAPI) Create(ctx context.Context, sid string, body RoleCreateParams) (Role, error) {
-	return r.post(ctx, fmt.Sprintf("/Services/%s/Roles", sid), body.encode())
+func (r roleAPI) Create(ctx context.Context, serviceSid string, body RoleCreateParams) (Role, error) {
+	return r.post(ctx, fmt.Sprintf("/Services/%s/Roles", serviceSid), body.encode())
 }
 
 // POST /Services/{Service SID}/Roles/{Role SID}
 // https://www.twilio.com/docs/chat/rest/roles#update-a-role
-func (r roleAPI) Update(ctx context.Context, sid, roleSID string, body RoleUpdateParams) (Role, error) {
-	return r.post(ctx, fmt.Sprintf("/Services/%s/Roles/%s", sid, roleSID), body.encode())
+func (r roleAPI) Update(ctx context.Context, serviceSid, roleSid string, body RoleUpdateParams) (Role, error) {
+	return r.post(ctx, fmt.Sprintf("/Services/%s/Roles/%s", serviceSid, roleSid), body.encode())
 }
 
 // DELETE /Services/{Service SID}/Roles/{Role SID}
 // https://www.twilio.com/docs/chat/rest/roles#delete-a-role
-func (r roleAPI) Delete(ctx context.Context, sid, roleSID string) error {
-	_, err := r.client.Delete(ctx, fmt.Sprintf("/Services/%s/Roles/%s", sid, roleSID))
+func (r roleAPI) Delete(ctx context.Context, serviceSid, roleSid string) error {
+	_, err := r.client.Delete(ctx, fmt.Sprintf("/Services/%s/Roles/%s", serviceSid, roleSid))
 	return err
 }
 

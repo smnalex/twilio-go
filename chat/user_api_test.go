@@ -95,7 +95,7 @@ func TestUserUpdate(t *testing.T) {
 				expBody    = []byte("")
 			)
 
-			if exp := "/Services/sid/Users/userSid"; exp != path {
+			if exp := "/Services/sid/Users/usid"; exp != path {
 				t.Errorf("exp path %s, got %s", exp, path)
 			}
 			if !bytes.Equal(expBody, gotBody) {
@@ -110,7 +110,7 @@ func TestUserUpdate(t *testing.T) {
 		)
 		json.NewDecoder(f).Decode(&exp)
 
-		user, err := (userAPI{client}).Update(context.TODO(), "sid", "userSid", UserUpdateParams{})
+		user, err := (userAPI{client}).Update(context.TODO(), "sid", "usid", UserUpdateParams{})
 		if err != nil {
 			t.Errorf("exp no err, got %v", err)
 		}
@@ -121,7 +121,7 @@ func TestUserUpdate(t *testing.T) {
 
 	t.Run("errors", func(t *testing.T) {
 		fn := func(ctx context.Context, client *HTTPClientMock) (interface{}, error) {
-			return (userAPI{client}).Update(ctx, "sid", "userSid", UserUpdateParams{})
+			return (userAPI{client}).Update(ctx, "sid", "usid", UserUpdateParams{})
 		}
 		APIMock(fn).TestPosts((t))
 	})
@@ -131,20 +131,20 @@ func TestUserDelete(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
 		client := &HTTPClientMock{}
 		client.DeleteFunc = func(ctx context.Context, path string) ([]byte, error) {
-			if exp := "/Services/sid/Users/userSid"; exp != path {
+			if exp := "/Services/sid/Users/usid"; exp != path {
 				t.Errorf("exp path %s, got %s", exp, path)
 			}
 			return nil, nil
 		}
 
-		if err := (userAPI{client}).Delete(context.TODO(), "sid", "userSid"); err != nil {
+		if err := (userAPI{client}).Delete(context.TODO(), "sid", "usid"); err != nil {
 			t.Errorf("exp no err, got %v", err)
 		}
 	})
 
 	t.Run("errors", func(t *testing.T) {
 		fn := func(ctx context.Context, client *HTTPClientMock) (interface{}, error) {
-			err := (userAPI{client}).Delete(ctx, "sid", "userSid")
+			err := (userAPI{client}).Delete(ctx, "sid", "usid")
 			return nil, err
 		}
 		APIMock(fn).TestDeletes((t))

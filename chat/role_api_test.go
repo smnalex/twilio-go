@@ -16,7 +16,7 @@ func TestRoleRead(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
 		client := &HTTPClientMock{}
 		client.GetFunc = func(ctx context.Context, path string) ([]byte, error) {
-			if exp := "/Services/sid/Roles/rolesid"; exp != path {
+			if exp := "/Services/sid/Roles/rsid"; exp != path {
 				t.Errorf("exp path %s, got %s", exp, path)
 			}
 			return ioutil.ReadFile("fixtures/role.json")
@@ -28,7 +28,7 @@ func TestRoleRead(t *testing.T) {
 		)
 		json.NewDecoder(f).Decode(&exp)
 
-		role, err := roleAPI{client}.Read(context.TODO(), "sid", "rolesid")
+		role, err := roleAPI{client}.Read(context.TODO(), "sid", "rsid")
 		if err != nil {
 			t.Errorf("exp no err, got %v", err)
 		}
@@ -39,7 +39,7 @@ func TestRoleRead(t *testing.T) {
 
 	t.Run("errors", func(t *testing.T) {
 		fn := func(ctx context.Context, client *HTTPClientMock) (interface{}, error) {
-			return roleAPI{client}.Read(ctx, "sid", "roleSid")
+			return roleAPI{client}.Read(ctx, "sid", "rsid")
 		}
 		APIMock(fn).TestGets((t))
 	})
@@ -95,7 +95,7 @@ func TestRoleUpdate(t *testing.T) {
 				expBody    = []byte("Permission=A&Permission=B")
 			)
 
-			if exp := "/Services/sid/Roles/rolesid"; exp != path {
+			if exp := "/Services/sid/Roles/rsid"; exp != path {
 				t.Errorf("exp path %s, got %s", exp, path)
 			}
 			if !bytes.Equal(expBody, gotBody) {
@@ -109,7 +109,7 @@ func TestRoleUpdate(t *testing.T) {
 		)
 		json.NewDecoder(f).Decode(&exp)
 
-		role, err := (roleAPI{client}).Update(context.TODO(), "sid", "rolesid", RoleUpdateParams{[]string{"A", "B"}})
+		role, err := (roleAPI{client}).Update(context.TODO(), "sid", "rsid", RoleUpdateParams{[]string{"A", "B"}})
 		if err != nil {
 			t.Errorf("exp no err, got %v", err)
 		}
@@ -119,7 +119,7 @@ func TestRoleUpdate(t *testing.T) {
 	})
 	t.Run("errors", func(t *testing.T) {
 		fn := func(ctx context.Context, client *HTTPClientMock) (interface{}, error) {
-			return (roleAPI{client}).Update(ctx, "sid", "roleSid", RoleUpdateParams{})
+			return (roleAPI{client}).Update(ctx, "sid", "rsid", RoleUpdateParams{})
 		}
 		APIMock(fn).TestPosts((t))
 	})
@@ -129,13 +129,13 @@ func TestRoleDelete(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
 		client := &HTTPClientMock{}
 		client.DeleteFunc = func(ctx context.Context, path string) ([]byte, error) {
-			if exp := "/Services/sid/Roles/rolesid"; exp != path {
+			if exp := "/Services/sid/Roles/rsid"; exp != path {
 				t.Errorf("exp path %s, got %s", exp, path)
 			}
 			return nil, nil
 		}
 
-		if err := (roleAPI{client}).Delete(context.TODO(), "sid", "rolesid"); err != nil {
+		if err := (roleAPI{client}).Delete(context.TODO(), "sid", "rsid"); err != nil {
 			t.Errorf("exp no err, got %v", err)
 		}
 		if !client.DeleteInvoked {
@@ -145,7 +145,7 @@ func TestRoleDelete(t *testing.T) {
 
 	t.Run("errors", func(t *testing.T) {
 		fn := func(ctx context.Context, client *HTTPClientMock) (interface{}, error) {
-			err := (roleAPI{client}).Delete(ctx, "sid", "rolesid")
+			err := (roleAPI{client}).Delete(ctx, "sid", "rsid")
 			return nil, err
 		}
 		APIMock(fn).TestDeletes((t))

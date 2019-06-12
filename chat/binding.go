@@ -8,7 +8,7 @@ type BindingResource struct {
 // Binding resource of Programmable Chat represents push notification subscriptions
 // for Users within the Service instance.
 type Binding struct {
-	SID           string   `json:"sid"`
+	Sid           string   `json:"sid"`
 	AccountSid    string   `json:"account_sid"`
 	ServiceSid    string   `json:"service_sid"`
 	Endpoint      string   `json:"endpoint"`

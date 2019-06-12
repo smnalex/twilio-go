@@ -5,7 +5,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/google/go-querystring/query"
+	"github.com/smnalex/twilio-go"
 )
 
 // CredentialResource handles interactions with Credential Programmable Chat REST API.
@@ -39,8 +39,7 @@ type CredentialCreateParams struct {
 }
 
 func (ccp CredentialCreateParams) encode() io.Reader {
-	v, _ := query.Values(ccp)
-	return strings.NewReader(v.Encode())
+	return strings.NewReader(twilio.Values(ccp).Encode())
 }
 
 // CredentialUpdateParams holds information used in updateing an existing credential.
@@ -54,7 +53,6 @@ type CredentialUpdateParams struct {
 	Secret       string `url:",omitempty"`
 }
 
-func (ccp CredentialUpdateParams) encode() io.Reader {
-	v, _ := query.Values(ccp)
-	return strings.NewReader(v.Encode())
+func (cup CredentialUpdateParams) encode() io.Reader {
+	return strings.NewReader(twilio.Values(cup).Encode())
 }

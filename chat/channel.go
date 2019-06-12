@@ -5,7 +5,7 @@ import (
 	"io"
 	"strings"
 
-	"github.com/google/go-querystring/query"
+	"github.com/smnalex/twilio-go"
 )
 
 // ChannelResource handles interactions with Channels Programmable Chat REST API.
@@ -60,8 +60,7 @@ type ChannelCreateParams struct {
 }
 
 func (c ChannelCreateParams) encode() io.Reader {
-	v, _ := query.Values(c)
-	return strings.NewReader(v.Encode())
+	return strings.NewReader(twilio.Values(c).Encode())
 }
 
 // ChannelUpdateParams holds information used in updateing an existing channel.
@@ -81,6 +80,5 @@ type ChannelUpdateParams struct {
 }
 
 func (c ChannelUpdateParams) encode() io.Reader {
-	v, _ := query.Values(c)
-	return strings.NewReader(v.Encode())
+	return strings.NewReader(twilio.Values(c).Encode())
 }

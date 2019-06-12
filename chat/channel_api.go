@@ -16,9 +16,9 @@ type channelAPI struct {
 // GET /Services/{Service SID}/Channels/{Channel SID}
 // GET /Services/{Service SID}/Channels/{Unique Name}
 // https://www.twilio.com/docs/chat/rest/channels#retrieve-a-channel
-func (api channelAPI) Read(ctx context.Context, sid, identity string) (Channel, error) {
+func (api channelAPI) Read(ctx context.Context, serviceSid, identity string) (Channel, error) {
 	var chn Channel
-	data, err := api.client.Get(ctx, fmt.Sprintf("/Services/%s/Channels/%s", sid, identity))
+	data, err := api.client.Get(ctx, fmt.Sprintf("/Services/%s/Channels/%s", serviceSid, identity))
 	if err != nil {
 		return chn, err
 	}
@@ -28,22 +28,22 @@ func (api channelAPI) Read(ctx context.Context, sid, identity string) (Channel, 
 
 // POST /Services/{Service SID}/Channels/{Channel SID}
 // POST /Services/{Service SID}/Channels/{Unique Name}
-func (api channelAPI) Create(ctx context.Context, sid string, body ChannelCreateParams) (Channel, error) {
-	return api.post(ctx, fmt.Sprintf("/Services/%s/Channels", sid), body.encode())
+func (api channelAPI) Create(ctx context.Context, serviceSid string, body ChannelCreateParams) (Channel, error) {
+	return api.post(ctx, fmt.Sprintf("/Services/%s/Channels", serviceSid), body.encode())
 }
 
 // POST /Services/{Service SID}/Channels/{Channel SID}
 // POST /Services/{Service SID}/Channels/{Unique Name}
 // https://www.twilio.com/docs/chat/rest/channels#update-a-channel
-func (api channelAPI) Update(ctx context.Context, sid, identity string, body ChannelUpdateParams) (Channel, error) {
-	return api.post(ctx, fmt.Sprintf("/Services/%s/Channels/%s", sid, identity), body.encode())
+func (api channelAPI) Update(ctx context.Context, serviceSid, identity string, body ChannelUpdateParams) (Channel, error) {
+	return api.post(ctx, fmt.Sprintf("/Services/%s/Channels/%s", serviceSid, identity), body.encode())
 }
 
 // DELETE /Services/{Service SID}/Channels/{Channel SID}
 // DELETE /Services/{Service SID}/Channels/{Unique Name}
 // https://www.twilio.com/docs/chat/rest/channels#delete-a-channel
-func (api channelAPI) Delete(ctx context.Context, sid, identity string) error {
-	_, err := api.client.Delete(ctx, fmt.Sprintf("/Services/%s/Channels/%s", sid, identity))
+func (api channelAPI) Delete(ctx context.Context, serviceSid, identity string) error {
+	_, err := api.client.Delete(ctx, fmt.Sprintf("/Services/%s/Channels/%s", serviceSid, identity))
 	return err
 }
 

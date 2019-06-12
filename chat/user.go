@@ -5,7 +5,7 @@ import (
 	"io"
 	"strings"
 
-	"github.com/google/go-querystring/query"
+	"github.com/smnalex/twilio-go"
 )
 
 // UserResource handles interactions with Users Programmable Chat REST API.
@@ -16,9 +16,9 @@ type UserResource struct {
 // User resource of Programmable Chat represents a particular user represented by
 // an Identity as provided by the developer.
 type User struct {
-	SID        string `json:"sid"`
-	AccountSID string `json:"account_sid"`
-	ServiceSID string `json:"service_sid"`
+	Sid        string `json:"sid"`
+	AccountSid string `json:"account_sid"`
+	ServiceSid string `json:"service_sid"`
 	Identity   string `json:"identity"`
 	RoleSID    string `json:"role_sid"`
 
@@ -51,29 +51,27 @@ type User struct {
 // https://www.twilio.com/docs/chat/rest/users#create-a-user
 type UserCreateParams struct {
 	Identity string
-	RoleSID  string `url:"RoleSid,omitempty"`
+	RoleSid  string `url:"RoleSid,omitempty"`
 
 	// Attributes JSON string that stores application-specific data.
 	Attributes   json.RawMessage `url:",omitempty"`
 	FriendlyName string          `url:",omitempty"`
 }
 
-func (u UserCreateParams) encode() io.Reader {
-	b, _ := query.Values(u)
-	return strings.NewReader(b.Encode())
+func (ucp UserCreateParams) encode() io.Reader {
+	return strings.NewReader(twilio.Values(ucp).Encode())
 }
 
 // UserUpdateParams holds information used in updating an existing user.
 // https://www.twilio.com/docs/chat/rest/users#update-a-user
 type UserUpdateParams struct {
-	RoleSID      string `url:"RoleSid,omitempty"`
+	RoleSid      string `url:"RoleSid,omitempty"`
 	FriendlyName string `url:"FriendlyName,omitempty"`
 
 	// Attributes JSON string that stores application-specific data.
 	Attributes json.RawMessage `url:",omitempty"`
 }
 
-func (u UserUpdateParams) encode() io.Reader {
-	b, _ := query.Values(u)
-	return strings.NewReader(b.Encode())
+func (uup UserUpdateParams) encode() io.Reader {
+	return strings.NewReader(twilio.Values(uup).Encode())
 }

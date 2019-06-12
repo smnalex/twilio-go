@@ -95,7 +95,7 @@ func TestChannelUpdate(t *testing.T) {
 				expBody    = []byte("")
 			)
 
-			if exp := "/Services/sid/Channels/chansid"; exp != path {
+			if exp := "/Services/sid/Channels/identity"; exp != path {
 				t.Errorf("exp path %s, got %s", exp, path)
 			}
 			if !bytes.Equal(expBody, gotBody) {
@@ -110,7 +110,7 @@ func TestChannelUpdate(t *testing.T) {
 		)
 		json.NewDecoder(f).Decode(&exp)
 
-		channel, err := (channelAPI{client}).Update(context.TODO(), "sid", "chansid", ChannelUpdateParams{})
+		channel, err := (channelAPI{client}).Update(context.TODO(), "sid", "identity", ChannelUpdateParams{})
 		if err != nil {
 			t.Errorf("exp no err, got %v", err)
 		}
@@ -121,7 +121,7 @@ func TestChannelUpdate(t *testing.T) {
 
 	t.Run("errors", func(t *testing.T) {
 		fn := func(ctx context.Context, client *HTTPClientMock) (interface{}, error) {
-			return (channelAPI{client}).Update(ctx, "sid", "userSid", ChannelUpdateParams{})
+			return (channelAPI{client}).Update(ctx, "sid", "identity", ChannelUpdateParams{})
 		}
 		APIMock(fn).TestPosts((t))
 	})
@@ -131,13 +131,13 @@ func TestChannelDelete(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
 		client := &HTTPClientMock{}
 		client.DeleteFunc = func(ctx context.Context, path string) ([]byte, error) {
-			if exp := "/Services/sid/Channels/userSid"; exp != path {
+			if exp := "/Services/sid/Channels/identity"; exp != path {
 				t.Errorf("exp path %s, got %s", exp, path)
 			}
 			return nil, nil
 		}
 
-		if err := (channelAPI{client}).Delete(context.TODO(), "sid", "userSid"); err != nil {
+		if err := (channelAPI{client}).Delete(context.TODO(), "sid", "identity"); err != nil {
 			t.Errorf("exp no err, got %v", err)
 		}
 
@@ -148,7 +148,7 @@ func TestChannelDelete(t *testing.T) {
 
 	t.Run("errors", func(t *testing.T) {
 		fn := func(ctx context.Context, client *HTTPClientMock) (interface{}, error) {
-			err := (channelAPI{client}).Delete(ctx, "sid", "userSid")
+			err := (channelAPI{client}).Delete(ctx, "sid", "identity")
 			return nil, err
 		}
 		APIMock(fn).TestDeletes((t))

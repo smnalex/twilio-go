@@ -5,7 +5,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/google/go-querystring/query"
+	"github.com/smnalex/twilio-go"
 )
 
 // InviteResource handles interactions with Invite Programmable Chat REST API.
@@ -34,6 +34,5 @@ type InviteCreateParams struct {
 }
 
 func (icp InviteCreateParams) encode() io.Reader {
-	v, _ := query.Values(icp)
-	return strings.NewReader(v.Encode())
+	return strings.NewReader(twilio.Values(icp).Encode())
 }
