@@ -1,0 +1,21 @@
+{
+    "sid": "BSXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+    "account_sid": "ACXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+    "service_sid": "ISXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+    "date_created": "2016-10-21T11:37:03Z",
+    "date_updated": "2016-10-21T11:37:03Z",
+    "endpoint": "TestUser-endpoint",
+    "identity": "TestUser",
+    "binding_type": "gcm",
+    "credential_sid": "CRXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+    "message_types": [
+      "removed_from_channel",
+      "new_message",
+      "added_to_channel",
+      "invited_to_channel"
+    ],
+    "url": "https://chat.twilio.com/v2/Services/ISXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX/Bindings/BSXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+    "links": {
+      "user": "https://chat.twilio.com/v2/Services/ISXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX/Users/TestUser"
+    }
+  }
